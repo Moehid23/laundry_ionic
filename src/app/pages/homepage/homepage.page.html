@@ -1,0 +1,204 @@
+ <ion-menu side="start" menuId="first" contentId="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Menu</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-list>
+      <ion-item routerLink="/home" routerDirection="root">
+        <ion-icon slot="start" name="home-outline"></ion-icon>
+        <ion-label>Home</ion-label>
+      </ion-item>
+      <ion-item routerLink="/dashboard" routerDirection="root">
+        <ion-icon slot="start" name="analytics-outline"></ion-icon>
+        <ion-label>Dashboard</ion-label>
+      </ion-item>
+      <ion-item routerLink="/laundry" routerDirection="root">
+        <ion-icon slot="start" name="shirt-outline"></ion-icon>
+        <ion-label>Laundry</ion-label>
+      </ion-item>
+    </ion-list>
+    <ion-list class="bottom-list">
+      <ion-item routerLink="/settings" routerDirection="root">
+        <ion-icon slot="start" name="settings-outline"></ion-icon>
+        <ion-label>Settings</ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<!-- Main Content -->
+<div class="ion-page" id="main-content">
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="header-title">Washuplaundry.com</ion-title>
+    <ion-buttons slot="end" style="margin-right: 10px;">
+      <ion-icon name="person-circle"  size="large"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="background"></div>
+  <ion-title style="font-weight: bold; color: white; margin-left: -12px;">
+  <h1 style="font-size: 30px; margin: 0;">SELAMAT DATANG</h1>
+</ion-title>
+<ion-title style="color: white; margin-left: -12px;">Abdul Muhid Muthado</ion-title>
+<br>
+ <ion-grid>
+    <ion-row>
+      <ion-col size="12" style="display: flex; justify-content: center; align-items: center;">
+        <ion-icon name="arrow-back" (click)="previousImage()" style="color: white; font-size: 24px; position: absolute; left: 0; cursor: pointer;"></ion-icon>
+        <img (click)="nextImage()" [src]="images[currentIndex]" style="max-width: 100%; height: auto;" />
+        <ion-icon name="arrow-forward" (click)="nextImage()" style="color: white; font-size: 24px; position: absolute; right: 0; cursor: pointer;"></ion-icon>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div class="container">
+  <br>
+    <ion-title style="font-weight: bold; color: white; text-align: center;">KATEGORI LAUNDRY</ion-title>
+    <div class="promo-container">
+      <ion-card>
+        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+      </ion-card>
+      <ion-card>
+        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+      </ion-card>
+      <ion-card>
+        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+      </ion-card>
+    </div>
+    <div class="promo-container">
+      <ion-card>
+        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+      </ion-card>
+      <ion-card>
+        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+      </ion-card>
+      <ion-card>
+        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+      </ion-card>
+    </div>
+    <div class="promo-container">
+      <ion-card>
+        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+      </ion-card>
+      <ion-card>
+        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+      </ion-card>
+      <ion-card>
+        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+      </ion-card>
+    </div>
+<br>
+    <ion-title style="font-weight: bold; color: white; text-align: center;">INFORMATION</ion-title>
+    <div class="horizontal-scroll">
+      <ion-card class="custom-card small-card">
+        <ion-card-header>
+          <ion-card-title>Cuci Bersih</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          Here's a small text description for the cuci bersih content. Nothing more, nothing less.
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="custom-card small-card">
+        <ion-card-header>
+          <ion-card-title>Cuci Kering</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          Here's a small text description for the cuci kering setrika content. Nothing more, nothing less.
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="custom-card small-card">
+        <ion-card-header>
+          <ion-card-title>Setrika</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          Here's a small text description for the cuci kering setrika content. Nothing more, nothing less.
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="custom-card small-card">
+        <ion-card-header>
+          <ion-card-title>Cuci Cepat</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          Here's a small text description for the cuci cepat content. Nothing more, nothing less.
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>    
+  <ion-tab-bar slot="bottom">
+   <ion-tab-button tab="home" routerLink="/home">
+      <img src="../../assets/icon/home.png" width="35px">
+    </ion-tab-button>
+    <ion-tab-button tab="trolley">
+      <img src="../../assets/logolaundry.png" width="55px">
+    </ion-tab-button>
+    <ion-tab-button tab="search">
+      <img src="../../assets/icon/user.png" width="27px">
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-footer>
+
+<style>
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 125%;
+  background-image: url('../../assets/background.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: -1;
+}
+
+.horizontal-scroll {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.horizontal-scroll ion-card {
+  flex: 0 0 auto;
+  margin-right: 10px;
+}
+
+.small-card {
+  width: 150px; /* Atur lebar kartu */
+  height: 200px; /* Atur tinggi kartu */
+  border-radius: 5px; /* Atur sudut */
+  box-shadow: none; /* Hapus bayangan */
+}
+.bottom-list {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+.promo-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.promo-container ion-card {
+  width: 100px; /* Atur lebar kartu */
+  height: 100px; /* Atur tinggi kartu */
+  border-radius: 5px; /* Atur sudut */
+  box-shadow: none;
+}
+
+</style>

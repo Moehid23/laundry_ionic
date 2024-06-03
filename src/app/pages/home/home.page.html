@@ -1,0 +1,74 @@
+ <ion-header [translucent]="true">
+ <ion-toolbar>
+    <ion-title class="header-title">Washuplaundry.com</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="background"></div>
+  <div class="container">
+    <ion-tabs style="justify-content: space-between;">
+      <ion-row >
+        <ion-col class="title-col">
+          <br>
+          <span class="washup">WASHUP</span>
+          <br>
+          <span class="laundry">LAUNDRY</span>
+          <br>
+          <span class="location-text">
+            <img src="../../assets/location.png" width="15px">
+            Karawang, Jawa Barat Indonesia
+          </span>
+        </ion-col> <!-- Mengatur teks ke kanan -->
+        <ion-col size="auto">
+        <ion-button class="login-button" routerLink="/login">MASUK</ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-searchbar color="light" animated="true" show-cancel-button="focus" placeholder="Masukan No Resi"></ion-searchbar>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <img src="../../assets/logolaundry.png" style="max-width: 100%; height: auto;">
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-tabs>
+  </div>
+</ion-content>
+
+<ion-footer>    
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="home" routerLink="/home">
+      <img src="../../assets/icon/home.png" width="35px">
+    </ion-tab-button>
+    <ion-tab-button tab="trolley">
+      <img src="../../assets/logolaundry.png" width="55px">
+    </ion-tab-button>
+    <ion-tab-button tab="search">
+      <img src="../../assets/icon/user.png" width="27px">
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-footer>
+
+<style>
+.background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../../assets/background.jpg');
+    /* Sesuaikan path dengan lokasi gambar Anda */
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: -1;
+}
+
+.login-button {
+    border: 2px solid white; /* Menambahkan garis luar dengan warna putih */
+</style>

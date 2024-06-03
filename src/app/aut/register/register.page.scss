@@ -1,0 +1,62 @@
+.header-title {
+    text-align: center;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    margin-right: 10px;
+    font-size: 20px;
+    color: white;
+}
+
+.input-field {
+    border: 1px solid white;
+    padding: 10px;
+    --placeholder-color: white;
+}
+
+.logo-container {
+    text-align: center;
+}
+
+.logo-card {
+    width: 100%;
+    /* Atur lebar sesuai kebutuhan Anda */
+    max-width: 200px;
+    /* Atur lebar maksimum sesuai kebutuhan Anda */
+    height: auto;
+}
+
+.card {
+    background-color: transparent;
+    /* Atur latar belakang kartu menjadi transparan */
+}
+
+.white-text {
+    --color: white;
+}
+
+.register-text {
+    margin-top: 20px;
+    text-align: center;
+    color: white;
+    font-size: 16px;
+}
+
+
+
+@media screen and (max-width: 768px) {
+    .logo-card {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .logo-card {
+        width: 100%;
+    }
+}

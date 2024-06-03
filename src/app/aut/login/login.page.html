@@ -1,0 +1,129 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="header-title">Washuplaundry.com</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="background">
+    <div class="container">
+      <div class="logo-container">
+        <ion-card class="card">
+          <!-- Logo Laundry -->
+          <img src="../../assets/logolaundry.png" class="logo-card">
+          <ion-card-content>
+            <form (submit)="login()">
+              <span class="input-container">
+                <ion-icon name="mail-outline" class="input-icon"></ion-icon>
+                <ion-input [(ngModel)]="loginData.email" name="email" type="email" placeholder="Masukan Email" class="custom-input"></ion-input>
+              </span>
+              <br>
+              <span class="input-container">
+                <ion-icon name="lock-closed-outline" class="input-icon"></ion-icon>
+                <ion-input [(ngModel)]="loginData.password" name="password" type="password" placeholder="Masukan Password" class="custom-input"></ion-input>
+              </span>
+              <br>
+              <ion-button class="full-width-button" color="light" fill="outline" type="submit">Masuk</ion-button>
+            </form>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Tulisan "Belum punya akun? Registrasi sekarang!" -->
+        <div class="register-text">
+          Belum punya akun? <a routerLink="/register" class="register-link">Registrasi sekarang!</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>    
+  <ion-tab-bar slot="bottom">
+   <ion-tab-button tab="home" routerLink="/home">
+      <img src="../../assets/icon/home.png" width="35px">
+    </ion-tab-button>
+    <ion-tab-button tab="trolley">
+      <img src="../../assets/logolaundry.png" width="55px">
+    </ion-tab-button>
+    <ion-tab-button tab="search">
+      <img src="../../assets/icon/user.png" width="27px">
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-footer>
+
+<style>
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh; /* Menggunakan 100vh untuk tinggi viewport */
+  background-image: url('../../assets/background.jpg');
+  /* Sesuaikan path dengan lokasi gambar Anda */
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center; /* Mengatur logo-container ke tengah vertikal */
+  justify-content: center; /* Mengatur logo-container ke tengah horizontal */
+  z-index: -1;
+}
+
+.full-width-button {
+  width: 100%;
+}
+
+.card {
+  width: 90%; /* Sesuaikan dengan lebar yang diinginkan */
+  max-width: 500px; /* Optional: untuk membatasi lebar maksimal */
+  margin: 0 auto; /* Untuk memusatkan card */
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  color: white; /* Warna ikon input */
+  margin-right: 10px;
+}
+
+.white-text {
+  color: white !important; /* Warna teks input */
+}
+
+::placeholder {
+  color: white; /* Warna placeholder */
+  opacity: 1; /* Full opacity untuk placeholder */
+}
+
+ion-input {
+  --placeholder-color: white;
+}
+
+ion-input .native-input {
+  color: white !important; /* Warna teks input */
+}
+
+/* Gaya tambahan untuk teks menjadi putih dan tebal */
+.header-title,
+.register-text,
+.input-container ion-input {
+  color: white;
+  font-weight: bold;
+}
+
+.register-text a {
+  color: blue;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Kustomisasi garis pinggir berwarna putih pada input */
+::ng-deep .custom-input .native-input {
+  border: 1px solid white; /* Warna garis pinggir */
+  padding: 10px; /* Tambahkan padding untuk ruang antara teks dan garis pinggir */
+  border-radius: 4px; /* Optional: untuk membulatkan sudut */
+}
+</style>
