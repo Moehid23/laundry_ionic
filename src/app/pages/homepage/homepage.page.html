@@ -30,26 +30,26 @@
 
 <!-- Main Content -->
 <div class="ion-page" id="main-content">
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title class="header-title">Washuplaundry.com</ion-title>
-    <ion-buttons slot="end" style="margin-right: 10px;">
-      <ion-icon name="door"  size="large"></ion-icon>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-
+  <ion-header [translucent]="true">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title class="header-title">Washuplaundry.com</ion-title>
+      <ion-buttons slot="end" style="margin-right: 10px;">
+        <ion-button (click)="onDoorIconClick()" fill="clear">
+          <ion-icon name="log-out" size="large"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <div class="background"></div>
   <ion-title style="font-weight: bold; color: white; margin-left: -12px;">
   <h1 style="font-size: 30px; margin: 0;">SELAMAT DATANG</h1>
 </ion-title>
-<ion-title style="color: white; margin-left: -12px;">Abdul Muhid Muthado</ion-title>
-<br>
+<ion-title style="color: white; margin-left: -12px;">{{ userName }}</ion-title>
  <ion-grid>
     <ion-row>
       <ion-col size="12" style="display: flex; justify-content: center; align-items: center;">

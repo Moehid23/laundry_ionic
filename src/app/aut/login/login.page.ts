@@ -25,7 +25,8 @@ export class LoginPage {
       .subscribe(
         async (response) => {
           console.log('Login successful', response);
-          localStorage.setItem('access_token', response.access_token);
+          localStorage.setItem('access_token', response.data.token);
+          localStorage.setItem('user_name', response.data.user.name); // Simpan nama pengguna ke LocalStorage
           await this.showToast('Login berhasil!', 'success');
           this.router.navigateByUrl('/homepage');
         },
