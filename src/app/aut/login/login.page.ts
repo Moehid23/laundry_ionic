@@ -13,6 +13,7 @@ export class LoginPage {
     email: '',
     password: ''
   };
+  passwordFieldType: string = 'password';
 
   constructor(
     private http: HttpClient,
@@ -45,5 +46,17 @@ export class LoginPage {
       position: 'top' // Menentukan posisi toast di tengah layar
     });
     await toast.present();
+  }
+
+  togglePasswordVisibility() {
+    console.log('Toggle password visibility');
+    this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
+    console.log('New passwordFieldType:', this.passwordFieldType);
+  }
+
+  // Define the registerWithGoogle method
+  registerWithGoogle() {
+    // Add your code to handle Google registration here
+    console.log('Registering with Google');
   }
 }

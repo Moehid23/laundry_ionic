@@ -62,37 +62,9 @@
   <div class="container">
   <br>
     <ion-title style="font-weight: bold; color: white; text-align: center;">KATEGORI LAUNDRY</ion-title>
-    <div class="promo-container">
-      <ion-card>
-        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
-      </ion-card>
-      <ion-card>
-        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
-      </ion-card>
-      <ion-card>
-        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
-      </ion-card>
-    </div>
-    <div class="promo-container">
-      <ion-card>
-        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
-      </ion-card>
-      <ion-card>
-        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
-      </ion-card>
-      <ion-card>
-        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
-      </ion-card>
-    </div>
-    <div class="promo-container">
-      <ion-card>
-        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
-      </ion-card>
-      <ion-card>
-        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
-      </ion-card>
-      <ion-card>
-        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+<div class="promo-container">
+      <ion-card *ngFor="let service of services">
+        <img [src]="service.image_url" alt="Service Image" />
       </ion-card>
     </div>
 <br>

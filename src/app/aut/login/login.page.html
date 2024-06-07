@@ -7,15 +7,16 @@
           <img src="../../assets/logolaundry.png" class="logo-card">
           <ion-card-content>
             <form (ngSubmit)="login()">
-              <span class="input-container">
+              <div class="input-container">
                 <ion-icon name="mail-outline" class="input-icon"></ion-icon>
                 <ion-input [(ngModel)]="loginData.email" name="email" type="email" placeholder="Masukan Email" class="custom-input"></ion-input>
-              </span>
+              </div>
               <br>
-              <span class="input-container">
+              <div class="input-container">
                 <ion-icon name="lock-closed-outline" class="input-icon"></ion-icon>
-                <ion-input [(ngModel)]="loginData.password" name="password" type="password" placeholder="Masukan Password" class="custom-input"></ion-input>
-              </span>
+                <ion-input [(ngModel)]="loginData.password" [type]="passwordFieldType" name="password" placeholder="Masukan Password" class="custom-input"></ion-input>
+                <ion-icon [name]="passwordFieldType === 'password' ? 'eye-off' : 'eye'" class="eye-icon" (click)="togglePasswordVisibility()"></ion-icon>
+              </div>
               <br>
               <ion-button class="full-width-button" color="light" fill="outline" type="submit">Masuk</ion-button>
             </form>
@@ -27,6 +28,13 @@
           Belum punya akun? <a routerLink="/register" class="register-link">Registrasi sekarang!</a>
         </div>
 
+        <!-- Registrasi dengan akun Google -->
+      <div class="google-register">
+      <button ion-button (click)="registerWithGoogle()" class="google-button">
+      <img src="../../assets/google.png" alt="Google Logo" class="google-logo">
+      Masuk dengan Google 
+      </button>
+      </div>
       </div>
     </div>
   </div>
@@ -80,11 +88,21 @@
 .input-container {
   display: flex;
   align-items: center;
+  position: relative;
 }
 
 .input-icon {
   color: white; /* Warna ikon input */
   margin-right: 10px;
+}
+
+.eye-icon {
+  color: white;
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  z-index: 10; /* Pastikan z-index cukup tinggi agar dapat diklik */
+  pointer-events: auto; /* Pastikan pointer-events diatur ke auto */
 }
 
 .white-text {
@@ -165,4 +183,44 @@ ion-tab-button[selected] .tab-icon {
   flex: 1;
   text-align: right;
 }
+
+.google-register {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.google-register {
+  text-align: center;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.google-register p {
+  color: white;
+  font-weight: bold;
+}
+
+.google-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  background-color: white; /* Set the background color to white */
+  color: black; /* Set the text color to black */
+  border: none;
+}
+
+.google-button:hover {
+  background-color: #f0f0f0; /* Change background color on hover */
+}
+
+.google-logo {
+  width: 20px;
+  margin-right: 10px;
+}
+
+
 </style>
+
