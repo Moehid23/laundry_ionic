@@ -62,9 +62,17 @@
   <div class="container">
   <br>
     <ion-title style="font-weight: bold; color: white; text-align: center;">KATEGORI LAUNDRY</ion-title>
-<div class="promo-container">
+<<div class="promo-container">
       <ion-card *ngFor="let service of services">
-        <img [src]="service.image_url" alt="Service Image" />
+        <img [src]="'http://127.0.0.1:8000/storage/' + service.photo" alt="Service Image" />
+        <ion-card-header>
+          <ion-card-title>{{ service.name }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>Description:</strong> {{ service.description }}</p>
+          <p><strong>Price:</strong> {{ service.price }}</p>
+          <p><strong>Estimated Completion Time:</strong> {{ service.estimated_completion_time }}</p>
+        </ion-card-content>
       </ion-card>
     </div>
 <br>

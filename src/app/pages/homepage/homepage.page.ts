@@ -14,8 +14,8 @@ export class HomepagePage implements OnInit {
     'https://ionicframework.com/docs/img/demos/card-media.png'
   ];
   currentIndex = 0;
-  userName: string = ''; // Inisialisasi userName dengan string kosong
-  services: any[] = []; // Tambahkan properti untuk menyimpan data dari API
+  userName: string = '';
+  services: any[] = [];
 
   constructor(
     private navCtrl: NavController,
@@ -29,7 +29,6 @@ export class HomepagePage implements OnInit {
   }
 
   loadUserName() {
-    // Ambil nama pengguna dari LocalStorage saat halaman dimuat
     const storedUserName = localStorage.getItem('user_name');
     if (storedUserName !== null) {
       this.userName = storedUserName;
@@ -45,7 +44,7 @@ export class HomepagePage implements OnInit {
         .subscribe(
           (response) => {
             console.log('Data:', response);
-            this.services = response.data; // Asumsikan response.data adalah array layanan
+            this.services = response.data;
           },
           (error) => {
             console.error('Failed to fetch data', error);
@@ -82,7 +81,7 @@ export class HomepagePage implements OnInit {
           text: 'Ya',
           handler: () => {
             console.log('Logout dilakukan');
-            localStorage.clear(); // Hapus semua data dari LocalStorage saat logout
+            localStorage.clear();
             this.navCtrl.navigateRoot('/login');
           }
         }
