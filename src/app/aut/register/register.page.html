@@ -1,9 +1,3 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title class="header-title" >Washuplaundry.com</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true" class="ion-padding">
   <div class="background">
     <div class="container">
@@ -17,11 +11,7 @@
           <ion-card-content>
             <div class="input-container">
               <ion-icon class="input-icon" name="person"></ion-icon>
-              <ion-input label="Nama Depan :" label-placement="floating" fill="outline" placeholder="Masukan Nama Depan" style="color: white;"></ion-input>
-            </div>
-            <div class="input-container">
-              <ion-icon class="input-icon" name="person"></ion-icon>
-              <ion-input label="Nama Belakang :" label-placement="floating" fill="outline" placeholder="Masukan Nama Belakang" style="color: white;"></ion-input>
+              <ion-input label="Nama :" label-placement="floating" fill="outline" placeholder="Masukan Nama Anda" style="color: white;"></ion-input>
             </div>
             <div class="input-container">
               <ion-icon class="input-icon" name="mail"></ion-icon>
@@ -29,22 +19,15 @@
             </div>
             <div class="input-container">
               <ion-icon class="input-icon" name="lock-closed"></ion-icon>
-              <ion-input type="password" label="Password :" label-placement="floating" fill="outline" placeholder="Masukan Password" style="color: white;"></ion-input>
+              <ion-input type="password" label="Password :" label-placement="floating" fill="outline" placeholder="Masukan Password" style="color: white;" #passwordInput>
+                <ion-icon slot="end" class="input-icon" name="eye" (click)="togglePasswordVisibility(passwordInput)"></ion-icon>
+              </ion-input>
             </div>
             <div class="input-container">
-              <ion-icon class="input-icon" name="location"></ion-icon>
-              <ion-input label="Alamat :" label-placement="floating" fill="outline" placeholder="Masukkan Alamat" style="color: white;"></ion-input>
-            </div>
-            <div class="input-container">
-              <ion-icon class="input-icon" name="transgender"></ion-icon>
-              <ion-select label="Jenis Kelamin" label-placement="floating" fill="outline" style="color: white;">
-                <ion-select-option value="male">Laki-Laki</ion-select-option>
-                <ion-select-option value="female">Perempuan</ion-select-option>
-              </ion-select>
-            </div>
-            <div class="input-container">
-              <ion-icon class="input-icon" name="calendar"></ion-icon>
-              <ion-input type="date" label="Tanggal Lahir :" label-placement="floating" fill="outline" placeholder="Masukan Tanggal Lahir" style="color: white;"></ion-input>
+              <ion-icon class="input-icon" name="lock-closed"></ion-icon>
+              <ion-input type="password" label="Konfirmasi Password :" label-placement="floating" fill="outline" placeholder="Masukan Konfirmasi Password" style="color: white;" #confirmPasswordInput>
+                <ion-icon slot="end" class="input-icon" name="eye" (click)="togglePasswordVisibility(confirmPasswordInput)"></ion-icon>
+              </ion-input>
             </div>
             <ion-button expand="block" color="light" fill="outline">Daftar</ion-button>
           </ion-card-content>
@@ -54,8 +37,7 @@
   </div>
 </ion-content>
 
-
-<ion-footer>    
+<ion-footer>
   <ion-tab-bar slot="bottom">
     <ion-tab-button tab="home" routerLink="/home">
       <img src="../../assets/icon/home.png" width="35px">
@@ -70,93 +52,93 @@
 </ion-footer>
 
 <style>
-.background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%; /* Menggunakan 100% agar konten dapat di-scroll */
-  background-image: url('../../assets/background.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: -1;
-}
+  .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../../assets/background.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: -1;
+  }
 
-.container {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  overflow-y: auto; /* Tambahkan ini agar halaman bisa di-scroll */
-}
+  .container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
 
-.logo-container {
-  width: 100%;
-  text-align: center;
-}
+  .logo-container {
+    width: 100%;
+    text-align: center;
+  }
 
-.card {
-  width: 100%;
-  background-color: transparent;
-}
+  .card {
+    width: 100%;
+    background-color: transparent;
+  }
 
-.logo-card {
-  width: 100%;
-  max-width: 200px;
-  height: auto;
-}
-
-.input-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px; /* Menambahkan jarak bawah antara setiap elemen form */
-}
-
-.input-icon {
-  color: white;
-  margin-right: 10px;
-}
-
-.input-field {
-  --placeholder-color: white;
-}
-
-.white-text {
-  color: white !important;
-}
-
-.full-width-button {
-  width: 100%;
-}
-
-::placeholder {
-  color: white;
-  opacity: 1;
-}
-
-.input-container ion-input {
-  --border-color: white; /* Mengatur warna garis luar */
-  --color: white; /* Mengatur warna teks */
-}
-
-@media screen and (max-width: 768px) {
   .logo-card {
     width: 100%;
+    max-width: 200px;
+    height: auto;
   }
-}
 
-@media screen and (max-width: 576px) {
-  .logo-card {
+  .input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .input-icon {
+    color: white;
+    margin-right: 10px;
+  }
+
+  .input-field {
+    --placeholder-color: white;
+  }
+
+  .white-text {
+    color: white !important;
+  }
+
+  .full-width-button {
     width: 100%;
   }
-}
+
+  ::placeholder {
+    color: white;
+    opacity: 1;
+  }
+
+  .input-container ion-input {
+    --border-color: white;
+    --color: white;
+  }
+
+  @media screen and (max-width: 768px) {
+    .logo-card {
+      width: 100%;
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .logo-card {
+      width: 100%;
+    }
+  }
 </style>
-

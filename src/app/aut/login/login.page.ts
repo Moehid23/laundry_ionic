@@ -29,7 +29,8 @@ export class LoginPage {
           localStorage.setItem('access_token', response.data.token);
           localStorage.setItem('user_name', response.data.user.name); // Simpan nama pengguna ke LocalStorage
           await this.showToast('Login berhasil!', 'success');
-          this.router.navigateByUrl('/homepage');
+          // Redirect ke halaman home setelah berhasil login
+          this.router.navigateByUrl('/home');
         },
         async (error) => {
           console.error('Login failed', error);

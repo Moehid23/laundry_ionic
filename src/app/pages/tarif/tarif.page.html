@@ -1,0 +1,131 @@
+<ion-content>
+  <div class="background"></div>
+  <div class="header">
+    <h1>Tarif Laundry</h1>
+  </div>
+  
+  <ion-list class="transparent-list">
+    <ion-card *ngFor="let service of services" class="custom-card">
+      <ion-item>
+        <ion-thumbnail slot="start" class="thumbnail">
+          <img [src]="'https://fahrul.webframework.my.id/storage/' + service.photo" alt="Service Image">
+        </ion-thumbnail>
+        <ion-label>
+          <h2>{{ service.name }}</h2>
+          <p><strong>Estimasi Waktu:</strong> {{ service.estimated_completion_time }}</p>
+          <p><strong>Harga:</strong> {{ service.price }} per {{service.unit}}</p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+  </ion-list>
+</ion-content>
+
+<div class="fab-tab" style="position: relative;">
+  <a routerLink="/home">
+    <img src="../../assets/icon/home.png" class="fab-icon" width="100px" style="position: absolute; bottom: 0;">
+  </a>
+</div>
+
+<ion-footer>
+  <ion-tab-bar slot="bottom" class="tab-bar">
+    <ion-tab-button tab="home" routerLink="/home" class="tab-button left">
+      <img src="../../assets/riwayat.png" width="35px">
+    </ion-tab-button>
+    <ion-tab-button tab="search" routerLink="/profile" class="tab-button right">
+      <img src="../../assets/icon/user.png" width="27px">
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-footer>
+
+<style>
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 125%;
+  background-image: url('../../assets/background.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center; /* Memusatkan latar belakang */
+  z-index: -1;
+}
+
+
+.header {
+  background-color: #6bdef1;
+  color: white;
+  padding: 20px 0;
+  text-align: center;
+  border-bottom-left-radius: 50% 30%;
+  border-bottom-right-radius: 50% 30%;
+  margin-bottom: 10px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.fab-tab {
+  position: absolute;
+  bottom: -40px;
+  left: 90%;
+  transform: translateX(-50%);
+  z-index: 999;
+}
+
+.fab-icon {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 1px;
+}
+
+ion-tab-button[selected] .tab-icon {
+  filter: brightness(0) invert(1);
+  transform: scale(1.2);
+}
+
+.tab-icon {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.tab-bar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.tab-button.left {
+  flex: 1;
+  text-align: left;
+}
+
+.tab-button.right {
+  flex: 1;
+  text-align: right;
+}
+
+.thumbnail {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+/* Custom CSS for ion-card */
+.custom-card {
+  margin: 10px 20px; /* Adjust margins to make card smaller */
+  padding: 10px;
+  --ion-card-background: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+  --ion-card-border-radius: 8px;
+  --ion-card-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom CSS for transparent list */
+.transparent-list {
+  background-color: transparent; /* Set background color to transparent */
+}
+</style>

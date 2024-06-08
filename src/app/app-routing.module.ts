@@ -5,8 +5,12 @@ import { AuthGuard } from './guards/auth.guard';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'slide-2', // Mengubah rute pertama ke 'login'
     pathMatch: 'full'
+  },
+  {
+    path: 'slide-2',
+    loadChildren: () => import('./slides/slide-2/slide-2.module').then(m => m.Slide2PageModule)
   },
   {
     path: 'login',
@@ -23,12 +27,20 @@ const routes: Routes = [
   {
     path: 'homepage',
     loadChildren: () => import('./pages/homepage/homepage.module').then(m => m.HomepagePageModule),
-    canActivate: [AuthGuard] // Terapkan AuthGuard di sini
+    canActivate: [AuthGuard]
   },
   {
     path: 'profile',
     loadChildren: () => import('./pages/profile/profile.module').then(m => m.ProfilePageModule),
-    canActivate: [AuthGuard] // Use canActivate instead of anActivate
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'slide-1',
+    loadChildren: () => import('./slides/slide-1/slide-1.module').then(m => m.Slide1PageModule)
+  },
+  {
+    path: 'tarif',
+    loadChildren: () => import('./pages/tarif/tarif.module').then( m => m.TarifPageModule)
   },
 ];
 

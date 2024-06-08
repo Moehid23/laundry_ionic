@@ -1,104 +1,185 @@
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content>
   <div class="background"></div>
-  <div class="container">
-    <ion-tabs style="justify-content: space-between;">
+  <div class="header">
+    <h1>WASHUPLAUNDRY</h1>
+  </div>
+
+<div class="card-container">
+  <div class="profile-banner">
+    <img src="assets/icon/user.jpg" alt="Profile Image" />
+    <div class="profile-details">
+      <span class="name">{{ userName }}</span>
+      <span class="points">Poin: 1200</span>
+    </div>
+  </div>
+
+  <div class="icon-grid white-bg">
+    <ion-grid>
       <ion-row>
-        <ion-col class="title-col">
-          <span class="washup">WASHUP</span>
-          <br>
-          <span class="laundry">LAUNDRY</span>
-          <br>
-          <span class="location-text">
-            <img src="../../assets/location.png" width="15px">
-            Karawang, Jawa Barat Indonesia
-          </span>
-        </ion-col> <!-- Mengatur teks ke kanan -->
-        <ion-col size="auto">
-          <ion-button class="login-button" routerLink="/login" shape="round">MASUK</ion-button>
+        <ion-col size="4" class="menu-item" (click)="navigateToTarif()">
+          <img src="../../assets/icon/dollar-symbol (1).png" width="35px">
+          <p>Cek Tarif</p>
+        </ion-col>
+        <ion-col size="4" class="menu-item" (click)="navigateToHomePage()">
+          <img src="../../assets/icon/information-button.png" width="35px">
+          <p>Informasi Laundry</p>
+        </ion-col>
+        <ion-col size="4" class="menu-item" (click)="navigateToVoucher()">
+          <img src="../../assets/icon/tickets.png" width="35px">
+          <p>Claim Voucher</p>
         </ion-col>
       </ion-row>
-      <ion-grid>
-        <ion-row>
-          <ion-col>
-            <ion-searchbar color="light" animated="true" show-cancel-button="focus" placeholder="Masukan No Resi"></ion-searchbar>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-      <ion-grid>
-        <ion-row>
-          <ion-col>
-            <img src="../../assets/icon.png" style="max-width: 100%; height: auto;">
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-tabs>
+    </ion-grid>
   </div>
-</ion-content>
-
-<!-- Logo dan lingkaran -->
-
-<!-- Di halaman home -->
-<div class="fab-tab" style="position: relative;">
-  <a routerLink="/">
-    <img src="../../assets/logolaundry.png" class="fab-icon" width="100px" style="position: absolute; bottom: 0;">
-  </a>
 </div>
 
-<ion-footer>
-  <ion-tab-bar slot="bottom" class="tab-bar">
-    <ion-tab-button tab="home" routerLink="/home" class="tab-button left">
-      <img src="../../assets/icon/home.png" width="35px">
-    </ion-tab-button>
 
-    <ion-tab-button tab="search" routerLink="/search" class="tab-button right">
-      <img src="../../assets/icon/user.png" width="27px">
-    </ion-tab-button>
-  </ion-tab-bar>
-</ion-footer>
+      <ion-grid>
+      <ion-row>
+        <ion-col size="12" style="display: flex; justify-content: center; align-items: center;">
+          <ion-icon name="arrow-back" (click)="previousImage()" style="color: white; font-size: 24px; position: absolute; left: 0; cursor: pointer;"></ion-icon>
+          <img (click)="nextImage()" [src]="images[currentIndex]" style="max-width: 100%; height: auto;" />
+          <ion-icon name="arrow-forward" (click)="nextImage()" style="color: white; font-size: 24px; position: absolute; right: 0; cursor: pointer;"></ion-icon>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  
+    <div class="tracking-section">
+    <ion-input placeholder="Masukan Nomor Resi" clear-input></ion-input>
+    <ion-button expand="block">Cek Resi</ion-button>
+    </div>
+
+  </ion-content>
+
+    <div class="fab-tab" style="position: relative;">
+    <a routerLink="/home">
+      <img src="../../assets/icon/home.png" class="fab-icon" width="100px" style="position: absolute; bottom: 0;">
+    </a>
+  </div>
+
+  <ion-footer>
+    <ion-tab-bar slot="bottom" class="tab-bar">
+      <ion-tab-button tab="home" routerLink="/home" class="tab-button left">
+        <img src="../../assets/riwayat.png" width="35px">
+      </ion-tab-button>
+
+      <ion-tab-button tab="search" routerLink="/profile" class="tab-button right">
+        <img src="../../assets/icon/user.png" width="27px">
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-footer>
+
+
 
 <style>
-.background {
+   .background {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background-image: url('../../assets/background.jpg');
-    /* Sesuaikan path dengan lokasi gambar Anda */
+    height: 130%;
+    background-image: url('assets/background.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     z-index: -1;
-}
-.login-button {
-    border: 2px ;
-    color: white; /* Mengubah warna teks menjadi biru */}
+  }
 
+  .header {
+    background-color: #6bdef1;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    border-bottom-left-radius: 50% 30%;
+    border-bottom-right-radius: 50% 30%;
+    margin-bottom: 10px;
+  }
 
+  .header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .profile-banner {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    margin: 10px;
+    border-radius: 5px;
+  }
+
+  .profile-banner img {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+  }
+
+  .profile-details {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .profile-details .name {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .profile-details .points {
+    font-size: 14px;
+    color: #888;
+  }
+
+  .tracking-section {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 5px;
+    background-color: white;
+  }
+
+  .icon-grid {
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 10px;
+  }
+
+  .menu-item {
+    text-align: center;
+  }
+
+  .icon-grid ion-col {
+    margin-bottom: 10px;
+  }
 
 .fab-tab {
-    position: absolute;
-    bottom: -40px; /* Sesuaikan jarak dengan footer */
-    left: 90%;
-    transform: translateX(-50%);
-    z-index: 999; /* Tetapkan z-index agar muncul di depan konten lain */
+  position: absolute;
+  bottom: -40px;
+  left: 90%;
+  transform: translateX(-50%);
+  z-index: 999;
 }
 
 .fab-icon {
-    width: 75px;
-    height: 75px;
-    border-radius: 50%;
-    background: #ffffff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 1px;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 1px;
 }
 
 ion-tab-button[selected] .tab-icon {
-    filter: brightness(0) invert(1); /* Adjust the color of the icon when selected */
-    transform: scale(1.2); /* Scale up the icon when selected */
+  filter: brightness(0) invert(1);
+  transform: scale(1.2);
 }
 
 .tab-icon {
-    transition: transform 0.3s ease, filter 0.3s ease; /* Add transition for transform and filter properties */
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
 
 .tab-bar {
@@ -115,4 +196,9 @@ ion-tab-button[selected] .tab-icon {
   flex: 1;
   text-align: right;
 }
+
+  .white-bg {
+    background-color: white;
+  }
+  
 </style>
