@@ -10,8 +10,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class HomepagePage implements OnInit {
   images = [
     '../../assets/1.jpg',
-    'https://ionicframework.com/docs/img/demos/card-media.png',
-    'https://ionicframework.com/docs/img/demos/card-media.png'
+    '../../assets/2.jpg',
+    '../../assets/3.jpg'
   ];
   currentIndex = 0;
   userName: string = '';
@@ -40,7 +40,7 @@ export class HomepagePage implements OnInit {
     if (token) {
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
 
-      this.http.get<any>('http://127.0.0.1:8000/api/services', { headers })
+      this.http.get<any>('https://fahrul.webframework.my.id/api/services', { headers })
         .subscribe(
           (response) => {
             console.log('Data:', response);

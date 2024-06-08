@@ -1,4 +1,4 @@
- <ion-menu side="start" menuId="first" contentId="main-content">
+<ion-menu side="start" menuId="first" contentId="main-content">
   <ion-header>
     <ion-toolbar>
       <ion-title>Menu</ion-title>
@@ -44,96 +44,71 @@
     </ion-toolbar>
   </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <div class="background"></div>
-  <ion-title style="font-weight: bold; color: white; margin-left: -12px;">
-  <h1 style="font-size: 30px; margin: 0;">SELAMAT DATANG</h1>
-</ion-title>
-<ion-title style="color: white; margin-left: -12px;">{{ userName }}</ion-title>
- <ion-grid>
-    <ion-row>
-      <ion-col size="12" style="display: flex; justify-content: center; align-items: center;">
-        <ion-icon name="arrow-back" (click)="previousImage()" style="color: white; font-size: 24px; position: absolute; left: 0; cursor: pointer;"></ion-icon>
-        <img (click)="nextImage()" [src]="images[currentIndex]" style="max-width: 100%; height: auto;" />
-        <ion-icon name="arrow-forward" (click)="nextImage()" style="color: white; font-size: 24px; position: absolute; right: 0; cursor: pointer;"></ion-icon>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-  <div class="container">
-  <br>
-    <ion-title style="font-weight: bold; color: white; text-align: center;">KATEGORI LAUNDRY</ion-title>
-<<div class="promo-container">
-      <ion-card *ngFor="let service of services">
-        <img [src]="'http://127.0.0.1:8000/storage/' + service.photo" alt="Service Image" />
-        <ion-card-header>
-          <ion-card-title>{{ service.name }}</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <p><strong>Description:</strong> {{ service.description }}</p>
-          <p><strong>Price:</strong> {{ service.price }}</p>
-          <p><strong>Estimated Completion Time:</strong> {{ service.estimated_completion_time }}</p>
-        </ion-card-content>
-      </ion-card>
+  <ion-content [fullscreen]="true" class="ion-padding">
+    <div class="background"></div>
+    <ion-title style="font-weight: bold; color: white; margin-left: -12px;">
+      <h1 style="font-size: 30px; margin: 0;">SELAMAT DATANG</h1>
+    </ion-title>
+    <ion-title style="color: white; margin-left: -12px;">{{ userName }}</ion-title>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" style="display: flex; justify-content: center; align-items: center;">
+          <ion-icon name="arrow-back" (click)="previousImage()" style="color: white; font-size: 24px; position: absolute; left: 0; cursor: pointer;"></ion-icon>
+          <img (click)="nextImage()" [src]="images[currentIndex]" style="max-width: 100%; height: auto;" />
+          <ion-icon name="arrow-forward" (click)="nextImage()" style="color: white; font-size: 24px; position: absolute; right: 0; cursor: pointer;"></ion-icon>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+    <div class="container">
+      <br>
+      <ion-title style="font-weight: bold; color: white; text-align: center;">KATEGORI LAUNDRY</ion-title>
+      <div class="promo-container">
+        <ion-card *ngFor="let service of services">
+        <img [src]="'https://fahrul.webframework.my.id/storage/' + service.photo" alt="Service Image" />
+          <ion-card-header>
+            <ion-card-title>{{ service.name }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p><strong>Description:</strong> {{ service.description }}</p>
+            <p><strong>Price:</strong> {{ service.price }}</p>
+            <p><strong>Estimated Completion Time:</strong> {{ service.estimated_completion_time }}</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+      <br>
+      <ion-title style="font-weight: bold; color: white; text-align: center;">INFORMASI</ion-title>
+      <div class="horizontal-scroll">
+        <ion-card class="custom-card small-card" *ngFor="let service of services">
+          <ion-card-header>
+            <ion-card-title>{{ service.name }}</ion-card-title>
+            <ion-card-title>Rp.{{ service.price }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p><strong></strong> {{ service.description }}</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
     </div>
-<br>
-    <ion-title style="font-weight: bold; color: white; text-align: center;">INFORMASI</ion-title>
-    <div class="horizontal-scroll">
-      <ion-card class="custom-card small-card">
-        <ion-card-header>
-          <ion-card-title>Cuci Bersih</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          Here's a small text description for the cuci bersih content. Nothing more, nothing less.
-        </ion-card-content>
-      </ion-card>
+  </ion-content>
 
-      <ion-card class="custom-card small-card">
-        <ion-card-header>
-          <ion-card-title>Cuci Kering</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          Here's a small text description for the cuci kering setrika content. Nothing more, nothing less.
-        </ion-card-content>
-      </ion-card>
-
-      <ion-card class="custom-card small-card">
-        <ion-card-header>
-          <ion-card-title>Setrika</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          Here's a small text description for the cuci kering setrika content. Nothing more, nothing less.
-        </ion-card-content>
-      </ion-card>
-
-      <ion-card class="custom-card small-card">
-        <ion-card-header>
-          <ion-card-title>Cuci Cepat</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          Here's a small text description for the cuci cepat content. Nothing more, nothing less.
-        </ion-card-content>
-      </ion-card>
-    </div>
+  <div class="fab-tab" style="position: relative;">
+    <a routerLink="/">
+      <img src="../../assets/logolaundry.png" class="fab-icon" width="100px" style="position: absolute; bottom: 0;">
+    </a>
   </div>
-</ion-content>
 
-<div class="fab-tab" style="position: relative;">
-  <a routerLink="/">
-    <img src="../../assets/logolaundry.png" class="fab-icon" width="100px" style="position: absolute; bottom: 0;">
-  </a>
+  <ion-footer>
+    <ion-tab-bar slot="bottom" class="tab-bar">
+      <ion-tab-button tab="home" routerLink="/home" class="tab-button left">
+        <img src="../../assets/icon/home.png" width="35px">
+      </ion-tab-button>
+
+      <ion-tab-button tab="search" routerLink="/profile" class="tab-button right">
+        <img src="../../assets/icon/user.png" width="27px">
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-footer>
 </div>
-
-<ion-footer>
-  <ion-tab-bar slot="bottom" class="tab-bar">
-    <ion-tab-button tab="home" routerLink="/home" class="tab-button left">
-      <img src="../../assets/icon/home.png" width="35px">
-    </ion-tab-button>
-
-    <ion-tab-button tab="search" routerLink="/search" class="tab-button right">
-      <img src="../../assets/icon/user.png" width="27px">
-    </ion-tab-button>
-  </ion-tab-bar>
-</ion-footer>
 
 <style>
 .background {
@@ -141,7 +116,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 125%;
+  height: 130%;
   background-image: url('../../assets/background.jpg');
   background-size: cover;
   background-repeat: no-repeat;
@@ -161,16 +136,18 @@
 }
 
 .small-card {
-  width: 150px; /* Atur lebar kartu */
-  height: 200px; /* Atur tinggi kartu */
-  border-radius: 5px; /* Atur sudut */
-  box-shadow: none; /* Hapus bayangan */
+  width: 200px;
+  height: 270px;
+  border-radius: 5px;
+  box-shadow: none;
 }
+
 .bottom-list {
   position: absolute;
   bottom: 0;
   width: 100%;
 }
+
 .promo-container {
   display: flex;
   flex-wrap: wrap;
@@ -179,36 +156,36 @@
 }
 
 .promo-container ion-card {
-  width: 100px; /* Atur lebar kartu */
-  height: 100px; /* Atur tinggi kartu */
-  border-radius: 5px; /* Atur sudut */
+  width: 100px;
+  height: 100px;
+  border-radius: 5px;
   box-shadow: none;
 }
 
 .fab-tab {
-    position: absolute;
-    bottom: -40px; /* Sesuaikan jarak dengan footer */
-    left: 90%;
-    transform: translateX(-50%);
-    z-index: 999; /* Tetapkan z-index agar muncul di depan konten lain */
+  position: absolute;
+  bottom: -40px;
+  left: 90%;
+  transform: translateX(-50%);
+  z-index: 999;
 }
 
 .fab-icon {
-    width: 75px;
-    height: 75px;
-    border-radius: 50%;
-    background: #ffffff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 1px;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 1px;
 }
 
 ion-tab-button[selected] .tab-icon {
-    filter: brightness(0) invert(1); /* Adjust the color of the icon when selected */
-    transform: scale(1.2); /* Scale up the icon when selected */
+  filter: brightness(0) invert(1);
+  transform: scale(1.2);
 }
 
 .tab-icon {
-    transition: transform 0.3s ease, filter 0.3s ease; /* Add transition for transform and filter properties */
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
 
 .tab-bar {
@@ -225,5 +202,4 @@ ion-tab-button[selected] .tab-icon {
   flex: 1;
   text-align: right;
 }
-
 </style>

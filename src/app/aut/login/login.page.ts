@@ -22,7 +22,7 @@ export class LoginPage {
   ) { }
 
   login() {
-    this.http.post<any>('http://127.0.0.1:8000/api/login', this.loginData)
+    this.http.post<any>('https://fahrul.webframework.my.id/api/login', this.loginData)
       .subscribe(
         async (response) => {
           console.log('Login successful', response);

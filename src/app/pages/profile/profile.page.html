@@ -1,0 +1,223 @@
+<ion-menu side="start" menuId="first" contentId="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Menu</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-list>
+      <ion-item routerLink="/home" routerDirection="root">
+        <ion-icon slot="start" name="home-outline"></ion-icon>
+        <ion-label>Home</ion-label>
+      </ion-item>
+      <ion-item routerLink="/dashboard" routerDirection="root">
+        <ion-icon slot="start" name="analytics-outline"></ion-icon>
+        <ion-label>Dashboard</ion-label>
+      </ion-item>
+      <ion-item routerLink="/laundry" routerDirection="root">
+        <ion-icon slot="start" name="shirt-outline"></ion-icon>
+        <ion-label>Laundry</ion-label>
+      </ion-item>
+    </ion-list>
+    <ion-list class="bottom-list">
+      <ion-item routerLink="/settings" routerDirection="root">
+        <ion-icon slot="start" name="settings-outline"></ion-icon>
+        <ion-label>Settings</ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<ion-content id="main-content" [fullscreen]="true" class="ion-padding">
+  <div class="background">
+    <div class="container">
+      <div class="ion-page">
+        <ion-header [translucent]="true">
+          <ion-toolbar>
+            <ion-buttons slot="start">
+              <ion-menu-button></ion-menu-button>
+            </ion-buttons>
+            <ion-title class="header-title">Washuplaundry.com</ion-title>
+            <ion-buttons slot="end" style="margin-right: 10px;">
+              <ion-button (click)="onDoorIconClick()" fill="clear">
+                <ion-icon name="log-out" size="large"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        
+        <!-- Card pertama setelah header -->
+        <ion-card class="user-card">
+          <ion-card-content>
+            <ion-icon name="person" size="large" class="user-icon"></ion-icon>
+            <p class="upload-text">Unggah Foto</p>
+            <ion-card-header class="ion-text-center" style="bold">
+              <ion-card-title>Informasi Akun</ion-card-title>
+            </ion-card-header>
+            <ion-grid>
+              <ion-row>
+                <ion-col size="12">
+                  <ion-item>
+                    <ion-label position="floating">Name</ion-label>
+                    <ion-input type="text" required></ion-input>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col size="12">
+                  <ion-item>
+                    <ion-label position="floating">Email</ion-label>
+                    <ion-input type="email" required></ion-input>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col size="12">
+                  <ion-item>
+                    <ion-label position="floating">Password</ion-label>
+                    <ion-input [type]="showPassword ? 'text' : 'password'" required></ion-input>
+                    <ion-icon slot="end" [name]="showPassword ? 'eye-off' : 'eye'" (click)="togglePasswordVisibility()"></ion-icon>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col size="12">
+                  <ion-item>
+                    <ion-label position="floating">Verifikasi Password</ion-label>
+                    <ion-input [type]="showVerPassword ? 'text' : 'password'" required></ion-input>
+                    <ion-icon slot="end" [name]="showVerPassword ? 'eye-off' : 'eye'" (click)="toggleVerPasswordVisibility()"></ion-icon>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+            <ion-button expand="full" fill="solid" color="primary" (click)="ubahProfile()">
+              Ubah Profile
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+
+<div class="fab-tab" style="position: relative;">
+  <a routerLink="/">
+    <img src="../../assets/logolaundry.png" class="fab-icon" width="100px" style="position: absolute; bottom: 0;">
+  </a>
+</div>
+
+<ion-footer>
+  <ion-tab-bar slot="bottom" class="tab-bar">
+    <ion-tab-button tab="home" routerLink="/home" class="tab-button left">
+      <img src="../../assets/icon/home.png" width="35px">
+    </ion-tab-button>
+
+    <ion-tab-button tab="search" routerLink="/profile" class="tab-button right">
+      <img src="../../assets/icon/user.png" width="27px">
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-footer>
+
+<style>
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh; /* Menggunakan 100vh untuk tinggi viewport */
+  background-image: url('../../assets/background.jpg');
+  /* Sesuaikan path dengan lokasi gambar Anda */
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center; /* Mengatur logo-container ke tengah vertikal */
+  justify-content: center; /* Mengatur logo-container ke tengah horizontal */
+  z-index: -1;
+}
+
+.fab-tab {
+  position: absolute;
+  bottom: -40px; /* Sesuaikan jarak dengan footer */
+  left: 90%;
+  transform: translateX(-50%);
+  z-index: 999; /* Tetapkan z-index agar muncul di depan konten lain */
+}
+
+.fab-icon {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 1px;
+}
+
+ion-tab-button[selected] .tab-icon {
+  filter: brightness(0) invert(1); /* Adjust the color of the icon when selected */
+  transform: scale(1.2); /* Scale up the icon when selected */
+}
+
+.tab-icon {
+  transition: transform 0.3s ease, filter 0.3s ease; /* Add transition for transform and filter properties */
+}
+
+.tab-bar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.tab-button.left {
+  flex: 1;
+  text-align: left;
+}
+
+.tab-button.right {
+  flex: 1;
+  text-align: right;
+}
+
+.user-card {
+  width: 300px; /* Lebar card */
+  height: 590px; /* Tinggi card */
+  margin: auto; /* Mengatur card ke tengah halaman */
+  border-radius: 15px; /* Mengatur sudut card */
+  overflow: hidden; /* Memastikan gambar bulat tidak terlalu besar */
+  margin-top: 20px; /* Jarak antara card dan header */
+}
+
+.user-icon {
+  width: 80px; /* Ukuran icon bulat */
+  height: 80px;
+  border-radius: 50%; /* Membuat icon menjadi bulat */
+  background-color: #ddd; /* Warna background untuk icon */
+  margin: 0 auto 10px; /* Memberikan jarak antara ikon dan teks */
+  display: flex; /* Mengatur konten dalam flexbox */
+  align-items: center; /* Mengatur ikon ke tengah secara vertikal */
+  justify-content: center; /* Mengatur ikon ke tengah secara horizontal */
+}
+
+.user-icon ion-icon {
+  color: black; /* Warna icon */
+  font-size: 3em; /* Besarkan ukuran ikon */
+}
+
+.upload-text {
+  text-align: center; /* Mengatur teks ke tengah */
+  margin: 0; /* Menghapus margin default */
+}
+
+/* Style tambahan untuk card kedua */
+.info-card {
+  width: 300px; /* Lebar card */
+  margin: auto; /* Mengatur card ke tengah halaman */
+  border-radius: 15px; /* Mengatur sudut card */
+  overflow: hidden; /* Memastikan konten tidak keluar dari card */
+  margin-top: 5px; /* Kurangi jarak antara card pertama dan card kedua */
+}
+ion-card-title {
+  border-bottom: 1px solid black; /* Garis horizontal hitam dengan ketebalan 1px */
+  padding-bottom: 10px; /* Jarak antara judul dan garis */
+}
+
+</style>

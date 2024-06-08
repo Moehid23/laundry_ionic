@@ -24,7 +24,12 @@ const routes: Routes = [
     path: 'homepage',
     loadChildren: () => import('./pages/homepage/homepage.module').then(m => m.HomepagePageModule),
     canActivate: [AuthGuard] // Terapkan AuthGuard di sini
-  }
+  },
+  {
+    path: 'profile',
+    loadChildren: () => import('./pages/profile/profile.module').then(m => m.ProfilePageModule),
+    canActivate: [AuthGuard] // Use canActivate instead of anActivate
+  },
 ];
 
 @NgModule({
