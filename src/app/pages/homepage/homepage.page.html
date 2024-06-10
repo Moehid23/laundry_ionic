@@ -6,7 +6,7 @@
   </div>
   <div class="promo-container">
     <ion-card *ngFor="let service of services">
-      <img [src]="'https://fahrul.webframework.my.id/storage/' + service.photo" alt="Service Image" />
+      <img [src]="service.photo" alt="Service Image" />
       <ion-card-header>
         <ion-card-title>{{ service.name }}</ion-card-title>
       </ion-card-header>
@@ -40,7 +40,7 @@
 
 <ion-footer>
   <ion-tab-bar slot="bottom" class="tab-bar">
-    <ion-tab-button tab="home" routerLink="/home" class="tab-button left">
+    <ion-tab-button tab="home" routerLink="/riwayat" class="tab-button left">
       <img src="../../assets/riwayat.png" width="35px">
     </ion-tab-button>
     <ion-tab-button tab="search" routerLink="/profile" class="tab-button right">
@@ -59,6 +59,7 @@
   background-image: url('../../assets/background.jpg');
   background-size: cover;
   background-repeat: no-repeat;
+  background-position: center; /* Memusatkan latar belakang */
   z-index: -1;
 }
 

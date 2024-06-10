@@ -1,35 +1,10 @@
 <ion-content>
   <div class="background"></div>
   <div class="header">
-    <h1>Tarif Laundry</h1>
+    <h1>Voucher Laundry</h1>
   </div>
   
-  <ion-list class="transparent-list">
-    <ion-row>
-      <ion-col size="6" *ngFor="let service of services">
-        <ion-card class="custom-card">
-          <ion-card-header>
-            <ion-card-title>{{ service.name }}</ion-card-title>
-          </ion-card-header>
-          <ion-card-content class="card-content">
-            <ion-thumbnail class="thumbnail">
-              <img [src]="service.photo" alt="Service Image">
-            </ion-thumbnail>
-            <p><strong>Estimasi: </strong> {{ service.estimated_completion_time }}</p>
-            <p><strong>Harga:</strong> Rp.{{ service.price }}</p>
-            <p><strong>Jumlah Laundry:</strong> {{ service.quantity }} {{service.unit}}</p> <!-- Tampilkan jumlah laundry -->
-            <p><strong>Total Harga:</strong> Rp.{{ getTotalPrice(service) }}</p> <!-- Tampilkan harga total -->
-            <ion-button (click)="increaseQuantity(service)" fill="clear">
-              <ion-icon name="add-circle-outline"></ion-icon>
-            </ion-button> <!-- Tombol tambah -->
-            <ion-button (click)="decreaseQuantity(service)" fill="clear">
-              <ion-icon name="remove-circle-outline"></ion-icon>
-            </ion-button> <!-- Tombol kurang -->
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-list>
+
 </ion-content>
 
 <div class="fab-tab" style="position: relative;">

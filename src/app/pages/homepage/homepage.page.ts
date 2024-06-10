@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, AlertController } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../environments/environment'; // Import environment variable
 
 @Component({
   selector: 'app-homepage',
@@ -39,8 +40,9 @@ export class HomepagePage implements OnInit {
     const token = localStorage.getItem('access_token');
     if (token) {
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+      const url = `${environment.apiUrl}/services`; // Menggunakan URL dari environment variable
 
-      this.http.get<any>('https://fahrul.webframework.my.id/api/services', { headers })
+      this.http.get<any>(url, { headers })
         .subscribe(
           (response) => {
             console.log('Data:', response);

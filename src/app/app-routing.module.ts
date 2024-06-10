@@ -42,6 +42,14 @@ const routes: Routes = [
     path: 'tarif',
     loadChildren: () => import('./pages/tarif/tarif.module').then( m => m.TarifPageModule)
   },
+  {
+    path: 'riwayat',
+    loadChildren: () => import('./pages/riwayat/riwayat.module').then( m => m.RiwayatPageModule)
+  },
+  {
+    path: 'voucher',
+    loadChildren: () => import('./pages/voucher/voucher.module').then( m => m.VoucherPageModule)
+  },
 ];
 
 @NgModule({

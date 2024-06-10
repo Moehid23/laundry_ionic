@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -22,15 +23,29 @@ export class LoginPage {
   ) { }
 
   login() {
-    this.http.post<any>('https://fahrul.webframework.my.id/api/login', this.loginData)
+    if (!this.loginData.email || !this.loginData.password) {
+      this.showToast('Email dan password harus diisi', 'danger');
+      return;
+    }
+
+    const url = `${environment.apiUrl}/login`;
+    this.http.post<any>(url, this.loginData)
       .subscribe(
         async (response) => {
+          // Log respons API untuk debugging
           console.log('Login successful', response);
-          localStorage.setItem('access_token', response.data.token);
-          localStorage.setItem('user_name', response.data.user.name); // Simpan nama pengguna ke LocalStorage
-          await this.showToast('Login berhasil!', 'success');
-          // Redirect ke halaman home setelah berhasil login
-          this.router.navigateByUrl('/home');
+
+          // Periksa apakah respons memiliki properti data dan properti token di dalamnya
+          if (response && response.data && response.data.token) {
+            // Simpan token ke penyimpanan lokal
+            localStorage.setItem('login_token', response.data.token);
+
+            // Redirect ke halaman home setelah berhasil login
+            this.router.navigateByUrl('/home');
+          } else {
+            console.error('Invalid API response format', response);
+            await this.showToast('Login gagal. Format respons API tidak valid.', 'danger');
+          }
         },
         async (error) => {
           console.error('Login failed', error);
@@ -44,20 +59,17 @@ export class LoginPage {
       message: message,
       duration: 2000,
       color: color,
-      position: 'top' // Menentukan posisi toast di tengah layar
+      position: 'top'
     });
     await toast.present();
   }
 
   togglePasswordVisibility() {
-    console.log('Toggle password visibility');
     this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
-    console.log('New passwordFieldType:', this.passwordFieldType);
   }
 
-  // Define the registerWithGoogle method
   registerWithGoogle() {
-    // Add your code to handle Google registration here
     console.log('Registering with Google');
+    // Tambahkan kode untuk penanganan registrasi dengan Google di sini
   }
 }

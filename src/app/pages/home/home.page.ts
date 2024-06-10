@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { NavController } from '@ionic/angular'; // Import NavController
+import { NavController } from '@ionic/angular';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -17,13 +18,14 @@ export class HomePage implements OnInit {
   userName: string = '';
   services: any[] = [];
 
-  constructor(private http: HttpClient, private navCtrl: NavController) { } // Inject NavController
+  constructor(private http: HttpClient, private navCtrl: NavController) { }
 
   ngOnInit() {
     this.loadUserName();
     this.loadData();
   }
 
+  // Memuat nama pengguna dari localStorage
   loadUserName() {
     const storedUserName = localStorage.getItem('user_name');
     if (storedUserName !== null) {
@@ -31,12 +33,14 @@ export class HomePage implements OnInit {
     }
   }
 
+  // Memuat data layanan dari API
   loadData() {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('login_token');  // Pastikan nama token sesuai dengan yang disimpan saat login
     if (token) {
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+      const url = `${environment.apiUrl}/services`;
 
-      this.http.get<any>('https://fahrul.webframework.my.id/api/services', { headers })
+      this.http.get<any>(url, { headers })
         .subscribe(
           (response) => {
             console.log('Data:', response);
@@ -51,6 +55,7 @@ export class HomePage implements OnInit {
     }
   }
 
+  // Navigasi gambar ke gambar sebelumnya
   previousImage() {
     if (this.currentIndex > 0) {
       this.currentIndex--;
@@ -60,6 +65,7 @@ export class HomePage implements OnInit {
     console.log('Previous image:', this.currentIndex);
   }
 
+  // Navigasi gambar ke gambar berikutnya
   nextImage() {
     if (this.currentIndex < this.images.length - 1) {
       this.currentIndex++;
@@ -69,16 +75,19 @@ export class HomePage implements OnInit {
     console.log('Next image:', this.currentIndex);
   }
 
+  // Navigasi ke halaman tarif
   navigateToTarif() {
     this.navCtrl.navigateBack('/tarif');
   }
 
+  // Placeholder untuk navigasi ke halaman voucher
   navigateToVoucher() {
     // Redirect or navigate to the desired page for Voucher
     // Example: this.navCtrl.navigateForward('/voucher');
   }
 
+  // Navigasi kembali ke halaman beranda
   navigateToHomePage() {
-    this.navCtrl.navigateBack('/homepage'); // Menavigasi kembali ke halaman beranda
+    this.navCtrl.navigateBack('/homepage');
   }
 }
