@@ -39,6 +39,10 @@ export class LoginPage {
           if (response && response.data && response.data.token) {
             // Simpan token ke penyimpanan lokal
             localStorage.setItem('login_token', response.data.token);
+            console.log('Token disimpan di localStorage:', localStorage.getItem('login_token'));
+
+            // Tampilkan notifikasi keberhasilan login
+            await this.showToast('Login berhasil', 'success');
 
             // Redirect ke halaman home setelah berhasil login
             this.router.navigateByUrl('/home');

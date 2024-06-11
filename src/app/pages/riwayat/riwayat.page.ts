@@ -1,20 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-riwayat',
   templateUrl: './riwayat.page.html',
   styleUrls: ['./riwayat.page.scss'],
 })
-export class RiwayatPage {
-  transactions: any[] = []; // Define and initialize 'transactions' property
+export class RiwayatPage implements OnInit {
+  transactions: any[] = [];
+  customerId: string = '';
 
-  constructor() {
-    // Initialize or fetch data for 'transactions' here if necessary
-    // Example: this.transactions = someService.getTransactions();
+  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute) { }
+
+  ngOnInit() {
+    this.customerId = this.activatedRoute.snapshot.paramMap.get('id')!;
+    this.loadTransactionsByCustomerId(this.customerId);
   }
 
-  closeCard() {
-    // Implement the functionality to close the card here
-    console.log('Card closed'); // Example action, replace with your actual implementation
+  loadTransactionsByCustomerId(customerId: string) {
+    const url = `${environment.apiUrl}/transaksi/${customerId}`;
+    this.http.get<any>(url)
+      .subscribe(
+        (response) => {
+          console.log('Transaction data:', response);
+          this.transactions = response;
+        },
+        (error) => {
+          console.error('Failed to fetch transaction data', error);
+        }
+      );
   }
 }

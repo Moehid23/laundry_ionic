@@ -15,17 +15,19 @@ export class HomePage implements OnInit {
     '../../assets/3.jpg'
   ];
   currentIndex = 0;
-  userName: string = '';
+  userName: string = ''; // Tambahkan ini untuk menyimpan nama pengguna
   services: any[] = [];
+  customerData: any = {};
 
   constructor(private http: HttpClient, private navCtrl: NavController) { }
 
   ngOnInit() {
-    this.loadUserName();
+    this.loadUserName(); // Anda bisa menghapus atau memodifikasi ini jika tidak diperlukan lagi
     this.loadData();
+    this.loadCustomerData();
   }
 
-  // Memuat nama pengguna dari localStorage
+  // Memuat nama pengguna dari localStorage (opsional)
   loadUserName() {
     const storedUserName = localStorage.getItem('user_name');
     if (storedUserName !== null) {
@@ -48,6 +50,29 @@ export class HomePage implements OnInit {
           },
           (error) => {
             console.error('Failed to fetch data', error);
+          }
+        );
+    } else {
+      console.error('Token not found in localStorage');
+    }
+  }
+
+  // Memuat data customer dari API dan menetapkan userName
+  loadCustomerData() {
+    const token = localStorage.getItem('login_token');
+    if (token) {
+      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+      const url = `${environment.apiUrl}/customer`;
+
+      this.http.get<any>(url, { headers })
+        .subscribe(
+          (response) => {
+            console.log('Customer Data:', response);
+            this.customerData = response.data; // Asumsi respons API memiliki properti data
+            this.userName = response.data.name; // Tetapkan nama pengguna dari respons API
+          },
+          (error) => {
+            console.error('Failed to fetch customer data', error);
           }
         );
     } else {
@@ -82,8 +107,7 @@ export class HomePage implements OnInit {
 
   // Placeholder untuk navigasi ke halaman voucher
   navigateToVoucher() {
-    // Redirect or navigate to the desired page for Voucher
-    // Example: this.navCtrl.navigateForward('/voucher');
+    this.navCtrl.navigateBack('/voucher');
   }
 
   // Navigasi kembali ke halaman beranda
