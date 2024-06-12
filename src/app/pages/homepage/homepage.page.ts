@@ -92,4 +92,13 @@ export class HomepagePage implements OnInit {
 
     await alert.present();
   }
+
+  navigateToRiwayat() {
+    const customerId = localStorage.getItem('customer_id');
+    if (customerId) {
+      this.navCtrl.navigateForward(`/riwayat/${customerId}`);
+    } else {
+      console.error('Customer ID not found');
+    }
+  }
 }

@@ -40,9 +40,9 @@
 
 <ion-footer>
   <ion-tab-bar slot="bottom" class="tab-bar">
-    <ion-tab-button tab="home" routerLink="/riwayat" class="tab-button left">
-      <img src="../../assets/riwayat.png" width="35px">
-    </ion-tab-button>
+       <ion-tab-button tab="home" (click)="navigateToRiwayat()" class="tab-button left">
+        <img src="../../assets/riwayat.png" width="35px">
+      </ion-tab-button>
     <ion-tab-button tab="search" routerLink="/profile" class="tab-button right">
       <img src="../../assets/icon/user.png" width="27px">
     </ion-tab-button>

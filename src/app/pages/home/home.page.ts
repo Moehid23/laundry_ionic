@@ -70,6 +70,7 @@ export class HomePage implements OnInit {
             console.log('Customer Data:', response);
             this.customerData = response.data; // Asumsi respons API memiliki properti data
             this.userName = response.data.name; // Tetapkan nama pengguna dari respons API
+            localStorage.setItem('customer_id', response.data.id); // Simpan customer ID di localStorage
           },
           (error) => {
             console.error('Failed to fetch customer data', error);
@@ -113,5 +114,15 @@ export class HomePage implements OnInit {
   // Navigasi kembali ke halaman beranda
   navigateToHomePage() {
     this.navCtrl.navigateBack('/homepage');
+  }
+
+  // Navigasi ke halaman riwayat transaksi
+  navigateToRiwayat() {
+    const customerId = localStorage.getItem('customer_id');
+    if (customerId) {
+      this.navCtrl.navigateForward(`/riwayat/${customerId}`);
+    } else {
+      console.error('Customer ID not found');
+    }
   }
 }

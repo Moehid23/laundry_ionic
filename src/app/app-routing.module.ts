@@ -5,7 +5,7 @@ import { AuthGuard } from './guards/auth.guard';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'slide-2', // Mengubah rute pertama ke 'login'
+    redirectTo: 'slide-2',
     pathMatch: 'full'
   },
   {
@@ -40,15 +40,16 @@ const routes: Routes = [
   },
   {
     path: 'tarif',
-    loadChildren: () => import('./pages/tarif/tarif.module').then( m => m.TarifPageModule)
+    loadChildren: () => import('./pages/tarif/tarif.module').then(m => m.TarifPageModule)
   },
   {
-    path: 'riwayat',
-    loadChildren: () => import('./pages/riwayat/riwayat.module').then( m => m.RiwayatPageModule)
+    path: 'riwayat/:customerId',
+    loadChildren: () => import('./pages/riwayat/riwayat.module').then(m => m.RiwayatPageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'voucher',
-    loadChildren: () => import('./pages/voucher/voucher.module').then( m => m.VoucherPageModule)
+    loadChildren: () => import('./pages/voucher/voucher.module').then(m => m.VoucherPageModule)
   },
 ];
 

@@ -11,32 +11,40 @@
       <ion-card-title>Riwayat Transaksi</ion-card-title>
     </ion-card-header>
 
-    <ion-card-content>
-      <div class="table-container">
-        <table class="transaction-table">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Tanggal</th>
-              <th>Keterangan</th>
-              <th>Customer</th>
-              <th>Price</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let transaction of transactions; let i = index">
-              <td>{{ i + 1 }}</td>
-              <td>{{ transaction.tanggal }}</td>
-              <td>{{ transaction.keterangan }}</td>
-              <td>{{ transaction.customer }}</td>
-              <td>{{ transaction.price }}</td>
-              <td>{{ transaction.status }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </ion-card-content>
+<ion-card-content>
+  <div class="table-container">
+    <table class="transaction-table">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Tanggal</th>
+          <th>Keterangan</th>
+          <th>Items</th>
+          <th>Price</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let transaction of transactions; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ formatDate(transaction.updated_at) }}</td>
+          <td>{{ transaction.description }}</td>
+          <td style="white-space: nowrap;">
+  <ul>
+    <li *ngFor="let item of parseItems(transaction.items)">
+      {{ item.name }}: {{ item.qty }} {{ item.unit }}
+    </li>
+  </ul>
+</td>
+          <td>{{ transaction.price }}</td>
+          <td>{{ transaction.status }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ion-card-content>
+
+
   </ion-card>
   <!-- End of Card Riwayat Transaksi -->
 
