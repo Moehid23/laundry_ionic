@@ -32,20 +32,14 @@ export class LoginPage {
     this.http.post<any>(url, this.loginData)
       .subscribe(
         async (response) => {
-          // Log respons API untuk debugging
           console.log('Login successful', response);
 
-          // Periksa apakah respons memiliki properti data dan properti token di dalamnya
+          // Periksa keberadaan token di dalam response.data
           if (response && response.data && response.data.token) {
-            // Simpan token ke penyimpanan lokal
-            localStorage.setItem('login_token', response.data.token);
-            console.log('Token disimpan di localStorage:', localStorage.getItem('login_token'));
-
-            // Tampilkan notifikasi keberhasilan login
+            localStorage.setItem('access_token', response.data.token);
+            localStorage.setItem('user_name', response.data.name); // Simpan nama pengguna jika diperlukan
             await this.showToast('Login berhasil', 'success');
-
-            // Redirect ke halaman home setelah berhasil login
-            this.router.navigateByUrl('/home');
+            this.router.navigateByUrl('/home'); // Redirect ke halaman home setelah login berhasil
           } else {
             console.error('Invalid API response format', response);
             await this.showToast('Login gagal. Format respons API tidak valid.', 'danger');
@@ -74,6 +68,6 @@ export class LoginPage {
 
   registerWithGoogle() {
     console.log('Registering with Google');
-    // Tambahkan kode untuk penanganan registrasi dengan Google di sini
+    // Implementasi registrasi dengan Google jika diperlukan
   }
 }

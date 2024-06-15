@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, AlertController } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../../environments/environment'; // Import environment variable
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-homepage',
@@ -40,7 +40,7 @@ export class HomepagePage implements OnInit {
     const token = localStorage.getItem('access_token');
     if (token) {
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-      const url = `${environment.apiUrl}/services`; // Menggunakan URL dari environment variable
+      const url = `${environment.apiUrl}/services`;
 
       this.http.get<any>(url, { headers })
         .subscribe(
@@ -50,16 +50,26 @@ export class HomepagePage implements OnInit {
           },
           (error) => {
             console.error('Failed to fetch data', error);
+            if (error.status === 401) {
+              console.error('Unauthorized access, redirecting to login page');
+              this.navCtrl.navigateRoot('/login');
+            }
           }
         );
     } else {
       console.error('Token not found in localStorage');
+      this.navCtrl.navigateRoot('/login'); // Redirect ke halaman login jika token tidak ditemukan
     }
   }
 
-  nextImage() {
-    this.currentIndex = (this.currentIndex + 1) % this.images.length;
-    console.log('Next image:', this.currentIndex);
+  async presentErrorAlert(message: string) {
+    const alert = await this.alertController.create({
+      header: 'Error',
+      message: message,
+      buttons: ['OK']
+    });
+
+    await alert.present();
   }
 
   previousImage() {
@@ -67,24 +77,29 @@ export class HomepagePage implements OnInit {
     console.log('Previous image:', this.currentIndex);
   }
 
+  nextImage() {
+    this.currentIndex = (this.currentIndex + 1) % this.images.length;
+    console.log('Next image:', this.currentIndex);
+  }
+
   async onDoorIconClick() {
     const alert = await this.alertController.create({
-      header: 'Konfirmasi Logout',
-      message: 'Apakah Anda yakin ingin keluar Akun?',
+      header: 'Confirm Logout',
+      message: 'Are you sure you want to logout?',
       buttons: [
         {
-          text: 'Tidak',
+          text: 'Cancel',
           role: 'cancel',
           handler: () => {
-            console.log('Logout dibatalkan');
+            console.log('Logout cancelled');
           }
         },
         {
-          text: 'Ya',
+          text: 'Yes',
           handler: () => {
-            console.log('Logout dilakukan');
-            localStorage.clear();
-            this.navCtrl.navigateRoot('/login');
+            console.log('Logging out');
+            localStorage.clear(); // Clear localStorage saat logout
+            this.navCtrl.navigateRoot('/login'); // Redirect ke halaman login
           }
         }
       ]

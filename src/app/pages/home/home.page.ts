@@ -15,19 +15,16 @@ export class HomePage implements OnInit {
     '../../assets/3.jpg'
   ];
   currentIndex = 0;
-  userName: string = ''; // Tambahkan ini untuk menyimpan nama pengguna
-  services: any[] = [];
-  customerData: any = {};
+  userName: string = ''; // Nama pengguna
+  customerData: any = {}; // Data pelanggan
 
   constructor(private http: HttpClient, private navCtrl: NavController) { }
 
   ngOnInit() {
-    this.loadUserName(); // Anda bisa menghapus atau memodifikasi ini jika tidak diperlukan lagi
-    this.loadData();
-    this.loadCustomerData();
+    this.loadUserName(); // Memuat nama pengguna dari localStorage
+    this.loadCustomerData(); // Memuat data pelanggan dari API
   }
 
-  // Memuat nama pengguna dari localStorage (opsional)
   loadUserName() {
     const storedUserName = localStorage.getItem('user_name');
     if (storedUserName !== null) {
@@ -35,29 +32,6 @@ export class HomePage implements OnInit {
     }
   }
 
-  // Memuat data layanan dari API
-  loadData() {
-    const token = localStorage.getItem('login_token');  // Pastikan nama token sesuai dengan yang disimpan saat login
-    if (token) {
-      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-      const url = `${environment.apiUrl}/services`;
-
-      this.http.get<any>(url, { headers })
-        .subscribe(
-          (response) => {
-            console.log('Data:', response);
-            this.services = response.data;
-          },
-          (error) => {
-            console.error('Failed to fetch data', error);
-          }
-        );
-    } else {
-      console.error('Token not found in localStorage');
-    }
-  }
-
-  // Memuat data customer dari API dan menetapkan userName
   loadCustomerData() {
     const token = localStorage.getItem('login_token');
     if (token) {
@@ -69,7 +43,6 @@ export class HomePage implements OnInit {
           (response) => {
             console.log('Customer Data:', response);
             this.customerData = response.data; // Asumsi respons API memiliki properti data
-            this.userName = response.data.name; // Tetapkan nama pengguna dari respons API
             localStorage.setItem('customer_id', response.data.id); // Simpan customer ID di localStorage
           },
           (error) => {
@@ -81,7 +54,6 @@ export class HomePage implements OnInit {
     }
   }
 
-  // Navigasi gambar ke gambar sebelumnya
   previousImage() {
     if (this.currentIndex > 0) {
       this.currentIndex--;
@@ -91,7 +63,6 @@ export class HomePage implements OnInit {
     console.log('Previous image:', this.currentIndex);
   }
 
-  // Navigasi gambar ke gambar berikutnya
   nextImage() {
     if (this.currentIndex < this.images.length - 1) {
       this.currentIndex++;
@@ -101,22 +72,18 @@ export class HomePage implements OnInit {
     console.log('Next image:', this.currentIndex);
   }
 
-  // Navigasi ke halaman tarif
   navigateToTarif() {
     this.navCtrl.navigateBack('/tarif');
   }
 
-  // Placeholder untuk navigasi ke halaman voucher
   navigateToVoucher() {
     this.navCtrl.navigateBack('/voucher');
   }
 
-  // Navigasi kembali ke halaman beranda
   navigateToHomePage() {
     this.navCtrl.navigateBack('/homepage');
   }
 
-  // Navigasi ke halaman riwayat transaksi
   navigateToRiwayat() {
     const customerId = localStorage.getItem('customer_id');
     if (customerId) {
