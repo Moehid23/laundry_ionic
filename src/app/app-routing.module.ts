@@ -5,8 +5,12 @@ import { AuthGuard } from './guards/auth.guard';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'slide-2',
+    redirectTo: 'splash',
     pathMatch: 'full'
+  },
+  {
+    path: 'splash',
+    loadChildren: () => import('./slides/splash/splash.module').then( m => m.SplashPageModule)
   },
   {
     path: 'slide-2',
@@ -34,10 +38,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/profile/profile.module').then(m => m.ProfilePageModule),
     canActivate: [AuthGuard]
   },
-  {
-    path: 'slide-1',
-    loadChildren: () => import('./slides/slide-1/slide-1.module').then(m => m.Slide1PageModule)
-  },
+
   {
     path: 'tarif',
     loadChildren: () => import('./pages/tarif/tarif.module').then(m => m.TarifPageModule)
@@ -51,6 +52,8 @@ const routes: Routes = [
     path: 'voucher',
     loadChildren: () => import('./pages/voucher/voucher.module').then(m => m.VoucherPageModule)
   },
+  
+
 ];
 
 @NgModule({
