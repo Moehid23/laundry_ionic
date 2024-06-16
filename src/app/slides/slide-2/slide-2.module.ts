@@ -17,4 +17,4 @@ import { Slide2Page } from './slide-2.page';
   ],
   declarations: [Slide2Page]
 })
-export class Slide2PageModule {}
+export class Slide2PageModule { }

@@ -51,7 +51,8 @@ export class RiwayatPage implements OnInit {
       return Object.keys(parsedItems).map(key => ({
         name: key,
         qty: parsedItems[key].qty,
-        unit: parsedItems[key].unit
+        unit: parsedItems[key].unit,
+        price: parsedItems[key].price
       }));
     } catch (error) {
       console.error('Failed to parse items:', error);
