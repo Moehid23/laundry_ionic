@@ -65,9 +65,4 @@ export class LoginPage {
   togglePasswordVisibility() {
     this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
   }
-
-  registerWithGoogle() {
-    console.log('Registering with Google');
-    // Implementasi registrasi dengan Google jika diperlukan
-  }
 }

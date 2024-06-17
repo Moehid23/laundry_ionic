@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ToastController } from '@ionic/angular';
+import { Storage } from '@ionic/storage-angular'; // Import Ionic Storage
 
 @Component({
   selector: 'app-voucher',
@@ -12,18 +13,35 @@ export class VoucherPage implements OnInit {
 
   vouchers: any[] = [];
   customer: any = null; // Objek untuk menyimpan data pelanggan termasuk poin
+  private storage: Storage | null = null; // Ionic Storage instance
 
   constructor(
     private http: HttpClient,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private ionicStorage: Storage // Inject Ionic Storage
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.initStorage(); // Initialize Ionic Storage
     this.loadCustomerData();
     this.loadVouchers();
   }
 
+  async initStorage() {
+    this.storage = await this.ionicStorage.create(); // Create Ionic Storage instance
+  }
+
   loadCustomerData() {
+    this.storage?.get('customerData').then(data => {
+      if (data) {
+        this.customer = data;
+      } else {
+        this.fetchCustomerData();
+      }
+    });
+  }
+
+  fetchCustomerData() {
     const token = localStorage.getItem('login_token');
     if (token) {
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
@@ -33,6 +51,7 @@ export class VoucherPage implements OnInit {
         (response) => {
           console.log('Customer Data:', response);
           this.customer = response.data; // Asumsi respons API memiliki properti data yang berisi data pelanggan
+          this.storage?.set('customerData', response.data); // Save to storage
         },
         (error) => {
           console.error('Failed to fetch customer data', error);
@@ -44,6 +63,16 @@ export class VoucherPage implements OnInit {
   }
 
   loadVouchers() {
+    this.storage?.get('vouchersData').then(data => {
+      if (data) {
+        this.vouchers = data;
+      } else {
+        this.fetchVouchersData();
+      }
+    });
+  }
+
+  fetchVouchersData() {
     const token = localStorage.getItem('login_token');
     if (token) {
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
@@ -53,6 +82,7 @@ export class VoucherPage implements OnInit {
         (response) => {
           console.log('Vouchers Data:', response);
           this.vouchers = response.data;
+          this.storage?.set('vouchersData', response.data); // Save to storage
         },
         (error) => {
           console.error('Failed to fetch vouchers data', error);
@@ -74,6 +104,7 @@ export class VoucherPage implements OnInit {
           (response) => {
             console.log('Voucher claimed successfully', response);
             this.customer.points -= pointsRequired;
+            this.storage?.set('customerData', this.customer); // Update storage
 
             this.presentToast('Voucher berhasil diclaim', 'success');
           },

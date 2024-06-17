@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router'; // Import Router from Angular Router
+import { Storage } from '@ionic/storage-angular'; // Import Ionic Storage
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -10,14 +11,30 @@ import { environment } from '../../../environments/environment';
 })
 export class TarifPage implements OnInit {
   services: any[] = [];
+  private storage: Storage | null = null; // Ionic Storage instance
 
   constructor(private http: HttpClient, private router: Router) { } // Inject Router
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.initStorage(); // Initialize Ionic Storage
     this.loadData();
   }
 
+  async initStorage() {
+    this.storage = await new Storage().create(); // Create Ionic Storage instance
+  }
+
   loadData() {
+    this.storage?.get('services').then(data => {
+      if (data) {
+        this.services = data.map((service: any) => ({ ...service, quantity: 1 }));
+      } else {
+        this.fetchData();
+      }
+    });
+  }
+
+  fetchData() {
     const token = localStorage.getItem('access_token');
     if (token) {
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
@@ -28,6 +45,7 @@ export class TarifPage implements OnInit {
           (response) => {
             console.log('Data:', response);
             this.services = response.data.map((service: any) => ({ ...service, quantity: 1 }));
+            this.storage?.set('services', response.data); // Save to storage
           },
           (error) => {
             console.error('Failed to fetch data', error);

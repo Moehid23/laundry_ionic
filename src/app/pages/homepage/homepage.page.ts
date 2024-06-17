@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController, AlertController } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Storage } from '@ionic/storage-angular'; // Import Ionic Storage
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -18,15 +19,22 @@ export class HomepagePage implements OnInit {
   userName: string = '';
   services: any[] = [];
 
+  private storage: Storage | null = null; // Ionic Storage instance
+
   constructor(
     private navCtrl: NavController,
     private alertController: AlertController,
     private http: HttpClient
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.initStorage(); // Initialize Ionic Storage
     this.loadUserName();
     this.loadData();
+  }
+
+  async initStorage() {
+    this.storage = await new Storage().create(); // Create Ionic Storage instance
   }
 
   loadUserName() {
@@ -37,6 +45,16 @@ export class HomepagePage implements OnInit {
   }
 
   loadData() {
+    this.storage?.get('services').then(data => {
+      if (data) {
+        this.services = data;
+      } else {
+        this.fetchData();
+      }
+    });
+  }
+
+  fetchData() {
     const token = localStorage.getItem('access_token');
     if (token) {
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
@@ -46,13 +64,16 @@ export class HomepagePage implements OnInit {
         .subscribe(
           (response) => {
             console.log('Data:', response);
-            this.services = response.data;
+            this.services = response.data; // Set data to component
+            this.storage?.set('services', response.data); // Save to storage
           },
           (error) => {
             console.error('Failed to fetch data', error);
             if (error.status === 401) {
               console.error('Unauthorized access, redirecting to login page');
               this.navCtrl.navigateRoot('/login');
+            } else {
+              this.presentErrorAlert('Failed to load services');
             }
           }
         );

@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NavController, ToastController } from '@ionic/angular';
+import { Storage } from '@ionic/storage-angular'; // Import Ionic Storage
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -8,12 +9,13 @@ import { environment } from '../../../environments/environment';
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
 })
-export class HomePage {
+export class HomePage implements OnInit {
   resiNumber: string = '';
   resiData: any[] = []; // Data untuk menyimpan informasi resi
   userName: string = ''; // Nama pengguna
   customerData: any = {}; // Data pelanggan
   latestResiData: any = null; // Data status resi terbaru
+  private storage: Storage | null = null; // Ionic Storage instance
 
   images = [
     '../../assets/1.jpg',
@@ -28,9 +30,14 @@ export class HomePage {
     private toastCtrl: ToastController
   ) { }
 
-  ionViewWillEnter() {
+  async ngOnInit() {
+    await this.initStorage(); // Initialize Ionic Storage
     this.loadUserName(); // Memuat nama pengguna dari localStorage
     this.loadCustomerData(); // Memuat data pelanggan dari API
+  }
+
+  async initStorage() {
+    this.storage = await new Storage().create(); // Create Ionic Storage instance
   }
 
   loadUserName() {
@@ -41,6 +48,17 @@ export class HomePage {
   }
 
   loadCustomerData() {
+    this.storage?.get('customerData').then(data => {
+      if (data) {
+        this.customerData = data;
+        localStorage.setItem('customer_id', data.id); // Simpan customer ID di localStorage
+      } else {
+        this.fetchCustomerData();
+      }
+    });
+  }
+
+  fetchCustomerData() {
     const token = localStorage.getItem('login_token');
     if (token) {
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
@@ -51,6 +69,7 @@ export class HomePage {
           console.log('Customer Data:', response);
           this.customerData = response.data; // Asumsi respons API memiliki properti data
           localStorage.setItem('customer_id', response.data.id); // Simpan customer ID di localStorage
+          this.storage?.set('customerData', response.data); // Save to storage
         },
         (error) => {
           console.error('Failed to fetch customer data', error);
@@ -85,6 +104,17 @@ export class HomePage {
       return;
     }
 
+    this.storage?.get(`resiData_${this.resiNumber}`).then(data => {
+      if (data) {
+        this.resiData = data;
+        this.latestResiData = this.getLatestResiData(data);
+      } else {
+        this.fetchResiData();
+      }
+    });
+  }
+
+  fetchResiData() {
     const token = localStorage.getItem('login_token');
     if (token) {
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
@@ -95,6 +125,7 @@ export class HomePage {
           console.log('Resi Data:', response);
           this.resiData = response.data; // Asumsi respons API memiliki properti data
           this.latestResiData = this.getLatestResiData(response.data); // Ambil data status terbaru
+          this.storage?.set(`resiData_${this.resiNumber}`, response.data); // Save to storage
         },
         (error) => {
           console.error('Failed to fetch resi data', error);

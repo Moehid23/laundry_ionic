@@ -10,13 +10,17 @@ import { AppRoutingModule } from './app-routing.module';
 // Tambahkan import HttpClientModule
 import { HttpClientModule } from '@angular/common/http';
 
+// Tambahkan import untuk Ionic Storage
+import { IonicStorageModule } from '@ionic/storage-angular';
+
 @NgModule({
   declarations: [AppComponent],
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
-    HttpClientModule  // Tambahkan HttpClientModule di sini
+    HttpClientModule,  // Tambahkan HttpClientModule di sini
+    IonicStorageModule.forRoot()  // Inisialisasi Ionic Storage
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
