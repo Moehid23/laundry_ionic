@@ -4,70 +4,84 @@
     <h1>WASHUPLAUNDRY</h1>
   </div>
 
-<div class="card-container">
-  <div class="profile-banner">
-    <img src="assets/icon/user.jpg" alt="Profile Image" />
-    <div class="profile-details">
-      <span class="name">{{ customerData.name }}</span>
-      <span class="points">Poin: {{ customerData.points }}</span>
+  <div class="card-container">
+    <div class="profile-banner">
+      <img src="assets/icon/user.jpg" alt="Profile Image" />
+      <div class="profile-details">
+        <span class="name">{{ customerData.name }}</span>
+        <span class="points">Poin: {{ customerData.points }}</span>
+      </div>
+    </div>
+
+    <div class="icon-grid white-bg">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="4" class="menu-item" (click)="navigateToTarif()">
+            <img src="../../assets/icon/dollar-symbol (1).png" width="35px">
+            <p>Cek Tarif</p>
+          </ion-col>
+          <ion-col size="4" class="menu-item" (click)="navigateToHomePage()">
+            <img src="../../assets/icon/information-button.png" width="35px">
+            <p>Informasi Laundry</p>
+          </ion-col>
+          <ion-col size="4" class="menu-item" (click)="navigateToVoucher()">
+            <img src="../../assets/icon/tickets.png" width="35px">
+            <p>Claim Voucher</p>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </div>
   </div>
 
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" style="display: flex; justify-content: center; align-items: center;">
+        <ion-icon name="arrow-back" (click)="previousImage()" style="color: white; font-size: 24px; position: absolute; left: 0; cursor: pointer;"></ion-icon>
+        <img (click)="nextImage()" [src]="images[currentIndex]" style="max-width: 100%; height: auto;" />
+        <ion-icon name="arrow-forward" (click)="nextImage()" style="color: white; font-size: 24px; position: absolute; right: 0; cursor: pointer;"></ion-icon>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
-  <div class="icon-grid white-bg">
-    <ion-grid>
-      <ion-row>
-        <ion-col size="4" class="menu-item" (click)="navigateToTarif()">
-          <img src="../../assets/icon/dollar-symbol (1).png" width="35px">
-          <p>Cek Tarif</p>
-        </ion-col>
-        <ion-col size="4" class="menu-item" (click)="navigateToHomePage()">
-          <img src="../../assets/icon/information-button.png" width="35px">
-          <p>Informasi Laundry</p>
-        </ion-col>
-        <ion-col size="4" class="menu-item" (click)="navigateToVoucher()">
-          <img src="../../assets/icon/tickets.png" width="35px">
-          <p>Claim Voucher</p>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+ <div class="tracking-section">
+    <ion-input placeholder="Masukkan Nomor Resi" clearInput [(ngModel)]="resiNumber"></ion-input>
+    <ion-button expand="block" (click)="checkResi()">Cek Resi</ion-button>
+
+    <!-- Menggunakan Flexbox untuk layout dua kolom -->
+    <div *ngIf="latestResiData" class="latest-resi-card">
+      <ion-card>
+        <ion-card-content class="flex-container">
+          <div class="left-column">
+            <p><strong>Status:</strong></p>
+            <p><strong>Tanggal:</strong></p>
+          </div>
+          <div class="right-column">
+            <p>{{ latestResiData.status }}</p>
+            <p>{{ formatDate(latestResiData.changed_at) }}</p>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
   </div>
+
+</ion-content>
+
+<div class="fab-tab" style="position: relative;">
+  <a routerLink="/home">
+    <img src="../../assets/icon/home.png" class="fab-icon" width="100px" style="position: absolute; bottom: 0;">
+  </a>
 </div>
 
-
-      <ion-grid>
-      <ion-row>
-        <ion-col size="12" style="display: flex; justify-content: center; align-items: center;">
-          <ion-icon name="arrow-back" (click)="previousImage()" style="color: white; font-size: 24px; position: absolute; left: 0; cursor: pointer;"></ion-icon>
-          <img (click)="nextImage()" [src]="images[currentIndex]" style="max-width: 100%; height: auto;" />
-          <ion-icon name="arrow-forward" (click)="nextImage()" style="color: white; font-size: 24px; position: absolute; right: 0; cursor: pointer;"></ion-icon>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  
-    <div class="tracking-section">
-    <ion-input placeholder="Masukan Nomor Resi" clear-input></ion-input>
-    <ion-button expand="block">Cek Resi</ion-button>
-    </div>
-
-  </ion-content>
-
-    <div class="fab-tab" style="position: relative;">
-    <a routerLink="/home">
-      <img src="../../assets/icon/home.png" class="fab-icon" width="100px" style="position: absolute; bottom: 0;">
-    </a>
-  </div>
-
-  <ion-footer>
-    <ion-tab-bar slot="bottom" class="tab-bar">
-      <ion-tab-button tab="home" (click)="navigateToRiwayat()" class="tab-button left">
-        <img src="../../assets/riwayat.png" width="35px">
-      </ion-tab-button>
-      <ion-tab-button tab="search" routerLink="/profile" class="tab-button right">
-        <img src="../../assets/icon/user.png" width="27px">
-      </ion-tab-button>
-    </ion-tab-bar>
-  </ion-footer>
+<ion-footer>
+  <ion-tab-bar slot="bottom" class="tab-bar">
+    <ion-tab-button tab="home" (click)="navigateToRiwayat()" class="tab-button left">
+      <img src="../../assets/riwayat.png" width="35px">
+    </ion-tab-button>
+    <ion-tab-button tab="search" routerLink="/profile" class="tab-button right">
+      <img src="../../assets/icon/user.png" width="27px">
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-footer>
 
 
 
@@ -201,5 +215,35 @@ ion-tab-button[selected] .tab-icon {
   .white-bg {
     background-color: white;
   }
-  
+.tracking-section {
+  /* Styling untuk bagian tracking-section */
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 5px;
+  background-color: white;
+}
+
+.latest-resi-card {
+  /* Styling untuk div yang berisi ion-card */
+  margin-top: 10px;
+}
+
+.flex-container {
+  /* Menggunakan flexbox untuk layout dua kolom */
+  display: flex;
+  justify-content: space-between;
+}
+
+.left-column {
+  /* Mengatur kolom kiri */
+  flex: 1;
+}
+
+.right-column {
+  /* Mengatur kolom kanan */
+  flex: 2;
+  text-align: right; /* Mengatur teks di kanan dalam kolom kanan */
+}
+
 </style>
