@@ -5,6 +5,8 @@
     <h1>Riwayat Transaksi</h1>
   </div>
 
+  
+
   <!-- Card Riwayat Transaksi -->
   <ion-card class="transaction-card" *ngFor="let transaction of transactions">
     <ion-card-content>
@@ -189,4 +191,11 @@ ion-tab-button[selected] .tab-icon {
   flex: 1;
   text-align: right;
 }
+
+.custom-loading {
+  --background: rgba(0, 0, 0, 0.5); /* warna background semi-transparan */
+  --spinner-color: #ffffff; /* warna spinner */
+}
+
+
 </style>

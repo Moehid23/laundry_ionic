@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, AlertController } from '@ionic/angular';
+import { NavController, AlertController, LoadingController } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Storage } from '@ionic/storage-angular'; // Import Ionic Storage
+import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -19,78 +19,91 @@ export class HomepagePage implements OnInit {
   userName: string = '';
   services: any[] = [];
 
-  private storage: Storage | null = null; // Ionic Storage instance
+  private storage: Storage | null = null;
+  loading: any;
 
   constructor(
     private navCtrl: NavController,
     private alertController: AlertController,
-    private http: HttpClient
+    private http: HttpClient,
+    private loadingController: LoadingController,
+    private storageService: Storage
   ) { }
 
   async ngOnInit() {
-    await this.initStorage(); // Initialize Ionic Storage
+    await this.initStorage();
+    await this.presentLoading('Loading services...');
     this.loadUserName();
     this.loadData();
+    await this.dismissLoading();
   }
 
   async initStorage() {
-    this.storage = await new Storage().create(); // Create Ionic Storage instance
+    this.storage = await this.storageService.create();
   }
 
   loadUserName() {
     const storedUserName = localStorage.getItem('user_name');
-    if (storedUserName !== null) {
+    if (storedUserName) {
       this.userName = storedUserName;
     }
   }
 
-  loadData() {
-    this.storage?.get('services').then(data => {
+  async loadData() {
+    try {
+      const data = await this.storage?.get('services');
       if (data) {
         this.services = data;
       } else {
-        this.fetchData();
+        await this.fetchData();
       }
-    });
-  }
-
-  fetchData() {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-      const url = `${environment.apiUrl}/services`;
-
-      this.http.get<any>(url, { headers })
-        .subscribe(
-          (response) => {
-            console.log('Data:', response);
-            this.services = response.data; // Set data to component
-            this.storage?.set('services', response.data); // Save to storage
-          },
-          (error) => {
-            console.error('Failed to fetch data', error);
-            if (error.status === 401) {
-              console.error('Unauthorized access, redirecting to login page');
-              this.navCtrl.navigateRoot('/login');
-            } else {
-              this.presentErrorAlert('Failed to load services');
-            }
-          }
-        );
-    } else {
-      console.error('Token not found in localStorage');
-      this.navCtrl.navigateRoot('/login'); // Redirect ke halaman login jika token tidak ditemukan
+    } catch (error: any) { // Tambahkan tipe 'any' pada error
+      console.error('Error loading data:', error);
+      this.presentErrorAlert('Failed to load services');
     }
   }
 
-  async presentErrorAlert(message: string) {
-    const alert = await this.alertController.create({
-      header: 'Error',
-      message: message,
-      buttons: ['OK']
-    });
+  async fetchData() {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      console.error('Token not found in localStorage');
+      this.navCtrl.navigateRoot('/login');
+      return;
+    }
 
-    await alert.present();
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+    const url = `${environment.apiUrl}/services`;
+
+    try {
+      const response = await this.http.get<any>(url, { headers }).toPromise();
+      console.log('Data:', response);
+      this.services = response.data;
+      await this.storage?.set('services', response.data);
+    } catch (error: any) { // Tambahkan tipe 'any' pada error
+      console.error('Failed to fetch data', error);
+      if (error.status === 401) {
+        console.error('Unauthorized access, redirecting to login page');
+        this.navCtrl.navigateRoot('/login');
+      } else {
+        this.presentErrorAlert('Failed to load services');
+      }
+    }
+  }
+
+  async presentLoading(message: string) {
+    this.loading = await this.loadingController.create({
+      message: message,
+      spinner: 'circles',
+      translucent: true,
+      cssClass: 'custom-loading'
+    });
+    await this.loading.present();
+  }
+
+  async dismissLoading() {
+    if (this.loading) {
+      await this.loading.dismiss();
+    }
   }
 
   previousImage() {
@@ -119,8 +132,8 @@ export class HomepagePage implements OnInit {
           text: 'Yes',
           handler: () => {
             console.log('Logging out');
-            localStorage.clear(); // Clear localStorage saat logout
-            this.navCtrl.navigateRoot('/login'); // Redirect ke halaman login
+            localStorage.clear();
+            this.navCtrl.navigateRoot('/login');
           }
         }
       ]
@@ -137,4 +150,15 @@ export class HomepagePage implements OnInit {
       console.error('Customer ID not found');
     }
   }
+
+  async presentErrorAlert(message: string) {
+    const alert = await this.alertController.create({
+      header: 'Error',
+      message: message,
+      buttons: ['OK']
+    });
+
+    await alert.present();
+  }
+
 }

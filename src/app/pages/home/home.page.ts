@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { NavController, ToastController } from '@ionic/angular';
-import { Storage } from '@ionic/storage-angular'; // Import Ionic Storage
+import { NavController, ToastController, LoadingController } from '@ionic/angular'; // tambahkan LoadingController
+import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -11,11 +11,12 @@ import { environment } from '../../../environments/environment';
 })
 export class HomePage implements OnInit {
   resiNumber: string = '';
-  resiData: any[] = []; // Data untuk menyimpan informasi resi
-  userName: string = ''; // Nama pengguna
-  customerData: any = {}; // Data pelanggan
-  latestResiData: any = null; // Data status resi terbaru
-  private storage: Storage | null = null; // Ionic Storage instance
+  resiData: any[] = [];
+  userName: string = '';
+  customerData: any = {};
+  latestResiData: any = null;
+  private storage: Storage | null = null;
+  loading: any; // variabel untuk menyimpan objek loading
 
   images = [
     '../../assets/1.jpg',
@@ -27,17 +28,20 @@ export class HomePage implements OnInit {
   constructor(
     private http: HttpClient,
     private navCtrl: NavController,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private loadingController: LoadingController // tambahkan LoadingController
   ) { }
 
   async ngOnInit() {
     await this.initStorage(); // Initialize Ionic Storage
+    await this.presentLoading(); // tampilkan loading spinner saat memuat data
     this.loadUserName(); // Memuat nama pengguna dari localStorage
-    this.loadCustomerData(); // Memuat data pelanggan dari API
+    await this.loadCustomerData(); // Memuat data pelanggan dari API
+    await this.dismissLoading(); // tutup loading spinner setelah selesai memuat data
   }
 
   async initStorage() {
-    this.storage = await new Storage().create(); // Create Ionic Storage instance
+    this.storage = await new Storage().create();
   }
 
   loadUserName() {
@@ -47,36 +51,37 @@ export class HomePage implements OnInit {
     }
   }
 
-  loadCustomerData() {
-    this.storage?.get('customerData').then(data => {
+  async loadCustomerData() {
+    try {
+      const data = await this.storage?.get('customerData');
       if (data) {
         this.customerData = data;
-        localStorage.setItem('customer_id', data.id); // Simpan customer ID di localStorage
+        localStorage.setItem('customer_id', data.id);
       } else {
-        this.fetchCustomerData();
+        await this.fetchCustomerData();
       }
-    });
+    } catch (error) {
+      console.error('Error loading customer data:', error);
+    }
   }
 
-  fetchCustomerData() {
-    const token = localStorage.getItem('login_token');
-    if (token) {
-      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-      const url = `${environment.apiUrl}/customer`;
+  async fetchCustomerData() {
+    try {
+      const token = localStorage.getItem('login_token');
+      if (token) {
+        const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+        const url = `${environment.apiUrl}/customer`;
 
-      this.http.get<any>(url, { headers }).subscribe(
-        (response) => {
-          console.log('Customer Data:', response);
-          this.customerData = response.data; // Asumsi respons API memiliki properti data
-          localStorage.setItem('customer_id', response.data.id); // Simpan customer ID di localStorage
-          this.storage?.set('customerData', response.data); // Save to storage
-        },
-        (error) => {
-          console.error('Failed to fetch customer data', error);
-        }
-      );
-    } else {
-      console.error('Token not found in localStorage');
+        const response = await this.http.get<any>(url, { headers }).toPromise();
+        console.log('Customer Data:', response);
+        this.customerData = response.data;
+        localStorage.setItem('customer_id', response.data.id);
+        await this.storage?.set('customerData', response.data);
+      } else {
+        console.error('Token not found');
+      }
+    } catch (error) {
+      console.error('Failed to fetch customer data', error);
     }
   }
 
@@ -104,10 +109,13 @@ export class HomePage implements OnInit {
       return;
     }
 
+    await this.presentLoading(); // tampilkan loading spinner saat memuat data resi
+
     this.storage?.get(`resiData_${this.resiNumber}`).then(data => {
       if (data) {
         this.resiData = data;
         this.latestResiData = this.getLatestResiData(data);
+        this.dismissLoading(); // tutup loading spinner setelah selesai memuat data resi
       } else {
         this.fetchResiData();
       }
@@ -123,18 +131,37 @@ export class HomePage implements OnInit {
       this.http.get<any>(url, { headers }).subscribe(
         (response) => {
           console.log('Resi Data:', response);
-          this.resiData = response.data; // Asumsi respons API memiliki properti data
-          this.latestResiData = this.getLatestResiData(response.data); // Ambil data status terbaru
-          this.storage?.set(`resiData_${this.resiNumber}`, response.data); // Save to storage
+          this.resiData = response.data;
+          this.latestResiData = this.getLatestResiData(response.data);
+          this.storage?.set(`resiData_${this.resiNumber}`, response.data);
+          this.dismissLoading(); // tutup loading spinner setelah selesai memuat data resi
         },
         (error) => {
           console.error('Failed to fetch resi data', error);
           this.presentToast('Nomor resi tidak ditemukan atau terjadi kesalahan');
+          this.dismissLoading(); // tutup loading spinner jika terjadi error
         }
       );
     } else {
       console.error('Token not found in localStorage');
       this.presentToast('Anda perlu login untuk melanjutkan');
+      this.dismissLoading(); // tutup loading spinner jika terjadi error
+    }
+  }
+
+  async presentLoading() {
+    this.loading = await this.loadingController.create({
+      message: 'Please wait...', // pesan yang akan ditampilkan pada loading spinner
+      spinner: 'circles', // jenis spinner yang digunakan (bisa diganti dengan 'dots', 'lines', dll)
+      translucent: true, // membuat background loading semi-transparan
+      cssClass: 'custom-loading' // kustomisasi tambahan untuk loading spinner
+    });
+    await this.loading.present();
+  }
+
+  async dismissLoading() {
+    if (this.loading) {
+      await this.loading.dismiss();
     }
   }
 
@@ -173,10 +200,8 @@ export class HomePage implements OnInit {
       return null;
     }
 
-    // Sorting data berdasarkan changed_at dari yang terbaru
     data.sort((a, b) => new Date(b.changed_at).getTime() - new Date(a.changed_at).getTime());
 
-    // Mengembalikan data dengan transaksi_id paling baru
     return data[0];
   }
 
@@ -184,4 +209,5 @@ export class HomePage implements OnInit {
     const date = new Date(timestamp);
     return date.toLocaleDateString();
   }
+
 }

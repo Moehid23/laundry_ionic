@@ -4,27 +4,16 @@
     <h1>Voucher Laundry</h1>
   </div>
 
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">claim-voucher</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
   <div *ngFor="let voucher of vouchers">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Voucher Laundry</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <div class="voucher-details">
-          <p>Discount: {{ voucher.discount_percent }}%</p>
-          <p>Points Required: {{ voucher.points_required }}</p>
-        </div>
+    <div class="voucher-card">
+      <img src="assets/ticket.png" alt="Ticket Image" class="ticket-image"/>
+      <div class="voucher-content">
+        <h2>{{ voucher.discount_percent }}%</h2>
+        <p> {{voucher.points_required}} points</p>
         <ion-button expand="block" color="primary" (click)="claimVoucher(voucher.id, voucher.points_required)">Claim</ion-button>
-      </ion-card-content>
-    </ion-card>
-  </div>  
-
+      </div>
+    </div>
+  </div>
 </ion-content>
 
 <div class="fab-tab" style="position: relative;">
@@ -35,9 +24,9 @@
 
 <ion-footer>
   <ion-tab-bar slot="bottom" class="tab-bar">
-    <ion-tab-button tab="home" routerLink="/riwayat" class="tab-button left">
-      <img src="../../assets/riwayat.png" width="35px">
-    </ion-tab-button>
+      <ion-tab-button tab="home" (click)="navigateToRiwayat()" class="tab-button left">
+        <img src="../../assets/riwayat.png" width="35px">
+      </ion-tab-button>
     <ion-tab-button tab="search" routerLink="/profile" class="tab-button right">
       <img src="../../assets/icon/user.png" width="27px">
     </ion-tab-button>
@@ -54,7 +43,7 @@
   background-image: url('../../assets/background.jpg');
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: center; /* Memusatkan latar belakang */
+  background-position: center;
   z-index: -1;
 }
 
@@ -72,6 +61,51 @@
   margin: 0;
   font-size: 24px;
   font-weight: bold;
+}
+
+.voucher-card {
+  position: relative;
+  margin: 1px;
+  text-align: center;
+}
+
+.ticket-image {
+  width: 60%;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.voucher-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: black; /* Mengatur warna teks menjadi hitam */
+  border-radius: 8px;
+}
+
+.voucher-content h2 {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.voucher-content p {
+  font-size: 18px;
+  margin: 8px 0;
+}
+
+ion-button {
+  --border-radius: 12px;
+  --background: #ff4b4b;
+  --background-activated: #ff6b6b;
+  --background-focused: #ff6b6b;
+  --background-hover: #ff6b6b;
 }
 
 .fab-tab {
@@ -116,26 +150,21 @@ ion-tab-button[selected] .tab-icon {
 }
 
 .thumbnail {
-  width: 100%; /* Ukuran thumbnail */
-  height: 100%; /* Ukuran thumbnail */
-  margin: auto; /* Memposisikan thumbnail ke tengah */
-  display: block; /* Membuat thumbnail menjadi blok */
-  border-radius: 50%; /* Membuat thumbnail menjadi lingkaran */
-}
-
-.custom-card {
-  margin: 10px; /* Adjust margins to make card smaller */
-  height: 430px; /* Set height of the card */
-  --ion-card-background: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
-  --ion-card-border-radius: 8px;
-  --ion-card-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.card-content {
-  text-align: center; /* Memusatkan konten dalam kartu */
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  display: block;
+  border-radius: 50%;
 }
 
 .transparent-list {
-  background-color: transparent; /* Set background color to transparent */
+  background-color: transparent;
 }
+
+.custom-loading {
+  --background: rgba(0, 0, 0, 0.5); /* warna background semi-transparan */
+  --spinner-color: #ffffff; /* warna spinner */
+}
+
+
 </style>

@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { ToastController } from '@ionic/angular';
-import { Storage } from '@ionic/storage-angular'; // Import Ionic Storage
+import { ToastController, LoadingController } from '@ionic/angular'; // tambahkan LoadingController
+import { Storage } from '@ionic/storage-angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-voucher',
@@ -12,124 +13,161 @@ import { Storage } from '@ionic/storage-angular'; // Import Ionic Storage
 export class VoucherPage implements OnInit {
 
   vouchers: any[] = [];
-  customer: any = null; // Objek untuk menyimpan data pelanggan termasuk poin
-  private storage: Storage | null = null; // Ionic Storage instance
+  customer: any = null;
+  private storage: Storage | null = null;
+  loading: any; // variabel untuk menyimpan objek loading
 
   constructor(
     private http: HttpClient,
     private toastController: ToastController,
-    private ionicStorage: Storage // Inject Ionic Storage
-  ) { }
+    private loadingController: LoadingController, // inject LoadingController
+    private ionicStorage: Storage,
+    private router: Router
+  ) {
+    this.initStorage();
+  }
 
   async ngOnInit() {
-    await this.initStorage(); // Initialize Ionic Storage
-    this.loadCustomerData();
-    this.loadVouchers();
+    await this.presentLoading(); // tampilkan loading spinner saat memuat data
+    await this.loadCustomerData();
+    await this.loadVouchers();
+    await this.dismissLoading(); // tutup loading spinner setelah selesai memuat data
   }
 
   async initStorage() {
-    this.storage = await this.ionicStorage.create(); // Create Ionic Storage instance
+    this.storage = await this.ionicStorage.create();
   }
 
-  loadCustomerData() {
-    this.storage?.get('customerData').then(data => {
+  async loadCustomerData() {
+    try {
+      const data = await this.storage?.get('customerData');
       if (data) {
         this.customer = data;
       } else {
-        this.fetchCustomerData();
+        await this.fetchCustomerData();
       }
-    });
-  }
-
-  fetchCustomerData() {
-    const token = localStorage.getItem('login_token');
-    if (token) {
-      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-      const url = `${environment.apiUrl}/customer`; // Sesuaikan dengan route API untuk mengambil data pelanggan
-
-      this.http.get<any>(url, { headers }).subscribe(
-        (response) => {
-          console.log('Customer Data:', response);
-          this.customer = response.data; // Asumsi respons API memiliki properti data yang berisi data pelanggan
-          this.storage?.set('customerData', response.data); // Save to storage
-        },
-        (error) => {
-          console.error('Failed to fetch customer data', error);
-        }
-      );
-    } else {
-      console.error('Token not found');
+    } catch (error) {
+      console.error('Error loading customer data:', error);
     }
   }
 
-  loadVouchers() {
-    this.storage?.get('vouchersData').then(data => {
-      if (data) {
-        this.vouchers = data;
-      } else {
-        this.fetchVouchersData();
-      }
-    });
-  }
-
-  fetchVouchersData() {
-    const token = localStorage.getItem('login_token');
-    if (token) {
-      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-      const url = `${environment.apiUrl}/vouchers`;
-
-      this.http.get<any>(url, { headers }).subscribe(
-        (response) => {
-          console.log('Vouchers Data:', response);
-          this.vouchers = response.data;
-          this.storage?.set('vouchersData', response.data); // Save to storage
-        },
-        (error) => {
-          console.error('Failed to fetch vouchers data', error);
-        }
-      );
-    } else {
-      console.error('Token not found');
-    }
-  }
-
-  claimVoucher(voucherId: number, pointsRequired: number) {
-    if (this.customer && this.customer.points >= pointsRequired) {
+  async fetchCustomerData() {
+    try {
       const token = localStorage.getItem('login_token');
       if (token) {
         const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-        const url = `${environment.apiUrl}/claim-voucher/${voucherId}`;
+        const url = `${environment.apiUrl}/customer`;
 
-        this.http.post<any>(url, {}, { headers }).subscribe(
-          (response) => {
-            console.log('Voucher claimed successfully', response);
-            this.customer.points -= pointsRequired;
-            this.storage?.set('customerData', this.customer); // Update storage
-
-            this.presentToast('Voucher berhasil diclaim', 'success');
-          },
-          (error) => {
-            console.error('Failed to claim voucher', error);
-            this.presentToast('Gagal melakukan klaim voucher', 'danger');
-          }
-        );
+        const response = await this.http.get<any>(url, { headers }).toPromise();
+        console.log('Customer Data:', response);
+        this.customer = response.data;
+        await this.storage?.set('customerData', response.data);
       } else {
         console.error('Token not found');
       }
-    } else {
-      console.error('Not enough points to claim this voucher');
-      this.presentToast('Point Anda tidak mencukupi untuk melakukan klaim voucher', 'danger');
+    } catch (error) {
+      console.error('Failed to fetch customer data', error);
+    }
+  }
+
+  async loadVouchers() {
+    try {
+      const data = await this.storage?.get('vouchersData');
+      if (data) {
+        this.vouchers = data;
+      } else {
+        await this.fetchVouchersData();
+      }
+    } catch (error) {
+      console.error('Error loading vouchers data:', error);
+    }
+  }
+
+  async fetchVouchersData() {
+    try {
+      const token = localStorage.getItem('login_token');
+      if (token) {
+        const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+        const url = `${environment.apiUrl}/vouchers`;
+
+        const response = await this.http.get<any>(url, { headers }).toPromise();
+        console.log('Vouchers Data:', response);
+        this.vouchers = response.data;
+        await this.storage?.set('vouchersData', response.data);
+      } else {
+        console.error('Token not found');
+      }
+    } catch (error) {
+      console.error('Failed to fetch vouchers data', error);
+    }
+  }
+
+  async claimVoucher(voucherId: number, pointsRequired: number) {
+    try {
+      if (this.customer && this.customer.points >= pointsRequired) {
+        await this.presentLoading(); // tampilkan loading spinner sebelum mengklaim voucher
+
+        const token = localStorage.getItem('login_token');
+        if (token) {
+          const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+          const url = `${environment.apiUrl}/claim-voucher/${voucherId}`;
+
+          const response = await this.http.post<any>(url, {}, { headers }).toPromise();
+          console.log('Voucher claimed successfully', response);
+
+          this.customer.points -= pointsRequired;
+          await this.storage?.set('customerData', this.customer);
+
+          this.presentToast('Voucher berhasil diclaim', 'success');
+        } else {
+          console.error('Token not found');
+        }
+
+        await this.dismissLoading(); // tutup loading spinner setelah mengklaim voucher
+      } else {
+        console.error('Not enough points to claim this voucher');
+        this.presentToast('Point Anda tidak mencukupi untuk melakukan klaim voucher', 'danger');
+      }
+    } catch (error) {
+      console.error('Failed to claim voucher', error);
+      this.presentToast('Gagal melakukan klaim voucher', 'danger');
+      await this.dismissLoading(); // pastikan loading spinner ditutup jika terjadi error
+    }
+  }
+
+  async presentLoading() {
+    this.loading = await this.loadingController.create({
+      message: 'Please wait...', // pesan yang akan ditampilkan pada loading spinner
+      spinner: 'circles', // jenis spinner yang digunakan (bisa diganti dengan 'dots', 'lines', dll)
+      translucent: true, // membuat background loading semi-transparan
+      cssClass: 'custom-loading' // kustomisasi tambahan untuk loading spinner
+    });
+    await this.loading.present();
+  }
+
+  async dismissLoading() {
+    if (this.loading) {
+      await this.loading.dismiss();
     }
   }
 
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
       message: message,
-      duration: 2000, // Durasi toast (ms)
-      position: 'top', // Posisi toast di bagian atas
-      color: color // Warna toast berdasarkan parameter
+      duration: 2000,
+      position: 'top',
+      color: color
     });
     toast.present();
+  }
+
+  navigateToRiwayat() {
+    const customerId = localStorage.getItem('customer_id');
+    if (customerId) {
+      this.router.navigate(['/riwayat', customerId]);
+    } else {
+      console.error('Customer ID not found');
+    }
   }
 
 }
