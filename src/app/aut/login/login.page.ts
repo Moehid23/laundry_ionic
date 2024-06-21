@@ -39,7 +39,6 @@ export class LoginPage {
           if (response && response.data && response.data.token) {
             localStorage.setItem('access_token', response.data.token);
             console.log('Token saved to localStorage:', response.data.token); // Log ini untuk verifikasi
-            localStorage.setItem('user_name', response.data.name);
             await this.showToast('Login berhasil', 'success');
             this.router.navigateByUrl('/home');
           } else {
