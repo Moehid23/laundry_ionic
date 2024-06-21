@@ -22,6 +22,7 @@ export class LoginPage {
     private toastController: ToastController
   ) { }
 
+  // login.page.ts
   login() {
     if (!this.loginData.email || !this.loginData.password) {
       this.showToast('Email dan password harus diisi', 'danger');
@@ -37,9 +38,10 @@ export class LoginPage {
           // Periksa keberadaan token di dalam response.data
           if (response && response.data && response.data.token) {
             localStorage.setItem('access_token', response.data.token);
-            localStorage.setItem('user_name', response.data.name); // Simpan nama pengguna jika diperlukan
+            console.log('Token saved to localStorage:', response.data.token); // Log ini untuk verifikasi
+            localStorage.setItem('user_name', response.data.name);
             await this.showToast('Login berhasil', 'success');
-            this.router.navigateByUrl('/home'); // Redirect ke halaman home setelah login berhasil
+            this.router.navigateByUrl('/home');
           } else {
             console.error('Invalid API response format', response);
             await this.showToast('Login gagal. Format respons API tidak valid.', 'danger');

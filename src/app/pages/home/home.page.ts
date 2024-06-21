@@ -65,10 +65,10 @@ export class HomePage implements OnInit {
     }
   }
 
+  // home.page.ts
   async fetchCustomerData() {
     try {
-      const token = localStorage.getItem('login_token');
-      if (token) {
+      const token = localStorage.getItem('access_token'); if (token) {
         const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
         const url = `${environment.apiUrl}/customer`;
 
@@ -84,6 +84,7 @@ export class HomePage implements OnInit {
       console.error('Failed to fetch customer data', error);
     }
   }
+
 
   previousImage() {
     if (this.currentIndex > 0) {

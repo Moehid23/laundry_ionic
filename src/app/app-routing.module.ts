@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
   {
@@ -30,13 +29,7 @@ const routes: Routes = [
   },
   {
     path: 'homepage',
-    loadChildren: () => import('./pages/homepage/homepage.module').then(m => m.HomepagePageModule),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'profile',
-    loadChildren: () => import('./pages/profile/profile.module').then(m => m.ProfilePageModule),
-    canActivate: [AuthGuard]
+    loadChildren: () => import('./pages/homepage/homepage.module').then(m => m.HomepagePageModule)
   },
 
   {
@@ -45,14 +38,15 @@ const routes: Routes = [
   },
   {
     path: 'riwayat/:customerId',
-    loadChildren: () => import('./pages/riwayat/riwayat.module').then(m => m.RiwayatPageModule),
-    canActivate: [AuthGuard]
+    loadChildren: () => import('./pages/riwayat/riwayat.module').then(m => m.RiwayatPageModule)
   },
   {
     path: 'voucher',
     loadChildren: () => import('./pages/voucher/voucher.module').then(m => m.VoucherPageModule)
-  },
-
+  },  {
+    path: 'profile',
+    loadChildren: () => import('./pages/profile/profile.module').then( m => m.ProfilePageModule)
+  }
 
 ];
 

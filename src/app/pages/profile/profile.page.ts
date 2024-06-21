@@ -1,120 +1,103 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { NavController } from '@ionic/angular';
+import { ToastController, NavController, LoadingController } from '@ionic/angular';
+import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment';
-import { ToastController } from '@ionic/angular';
+import { AnimationController, Animation } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
+
+
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
+
 })
 export class ProfilePage implements OnInit {
-  customerData: any = {
-    name: '',
-    contact: '',
-    address: '',
-    points: 0
-  };
-  password = '';
-  passwordConfirmation = '';
-  showPassword = false;
-  showVerPassword = false;
-  showForm = false; // This will toggle between view and edit mode
-  loadingData = true; // Indicates whether data is being loaded
+  customerData: any = {};
+  private storage: Storage | null = null;
+  showEditModal = false;
+  animation: Animation | undefined;
+  loading: HTMLIonLoadingElement | null = null;
 
   constructor(
     private http: HttpClient,
+    private toastController: ToastController,
     private navCtrl: NavController,
-    private toastController: ToastController
+    private animationCtrl: AnimationController,
+    private storageService: Storage,
+    private loadingController: LoadingController,
+    private alertController: AlertController // Tambahkan ini
+
   ) { }
 
-  ngOnInit() {
-    this.loadCustomerData();
-  }
-
-  loadCustomerData() {
-    const token = localStorage.getItem('login_token');
-    if (token) {
-      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-      const url = `${environment.apiUrl}/customer`;
-
-      this.http.get<any>(url, { headers }).subscribe(
-        (response) => {
-          console.log('Customer Data:', response);
-          this.customerData = response.data; // Assuming response structure has a 'data' property
-          this.loadingData = false; // Set loadingData to false after data is loaded
-        },
-        (error) => {
-          console.error('Failed to fetch customer data', error);
-          this.loadingData = false; // Set loadingData to false if there's an error
-          this.presentToast('Failed to fetch customer data. Please try again.', 'danger');
-        }
-      );
-    } else {
-      console.error('Token not found in localStorage');
-      this.loadingData = false; // Set loadingData to false if token is not found
-      this.presentToast('Token not found. Please log in again.', 'danger');
+  async ngOnInit() {
+    try {
+      await this.initStorage();
+      await this.loadCustomerData();
+    } catch (error) {
+      console.error('Error in ngOnInit:', error);
     }
   }
 
-  togglePasswordVisibility() {
-    this.showPassword = !this.showPassword;
+  async initStorage() {
+    this.storage = await this.storageService.create();
   }
 
-  toggleVerPasswordVisibility() {
-    this.showVerPassword = !this.showVerPassword;
-  }
-
-  async ubahProfile() {
-    const token = localStorage.getItem('login_token');
-    if (token) {
-      // Check if passwords match
-      if (this.password !== this.passwordConfirmation) {
-        this.presentToast('Password and confirmation do not match.', 'danger');
-        return;
+  async loadCustomerData() {
+    try {
+      const data = await this.storage?.get('customerData');
+      if (data) {
+        this.customerData = data;
+      } else {
+        await this.fetchCustomerData();
       }
-
-      const headers = new HttpHeaders({
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      });
-      const url = `${environment.apiUrl}/customer`;
-
-      // Prepare data to send including password fields
-      const data = {
-        ...this.customerData,
-        password: this.password,
-        password_confirmation: this.passwordConfirmation
-      };
-
-      this.http.put<any>(url, data, { headers }).subscribe(
-        (response) => {
-          console.log('Customer updated successfully', response);
-          this.presentToast('Profile updated successfully', 'success');
-          this.showForm = false; // Hide the form after successful update
-          // Optionally, update localStorage or perform any other actions upon successful update
-          // Example: localStorage.setItem('customer_id', response.id);
-        },
-        (error) => {
-          console.error('Failed to update customer data', error);
-          this.presentToast('Failed to update profile. Please try again.', 'danger');
-        }
-      );
-    } else {
-      console.error('Token not found in localStorage');
-      this.presentToast('Token not found. Please log in again.', 'danger');
+    } catch (error) {
+      console.error('Error loading customer data:', error);
     }
   }
+
+  async fetchCustomerData() {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+        const url = `${environment.apiUrl}/customer`;
+
+        const response = await this.http.get<any>(url, { headers }).toPromise();
+        console.log('Customer Data:', response);
+        this.customerData = response.data;
+        await this.storage?.set('customerData', response.data);
+      } else {
+        console.error('Token not found');
+      }
+    } catch (error) {
+      console.error('Failed to fetch customer data', error);
+    }
+  }
+  // profile.page.ts
+  async logout() {
+    try {
+      localStorage.removeItem('access_token'); // Hapus token dari localStorage
+      localStorage.removeItem('customer_id'); // Hapus customer ID dari localStorage jika ada
+      localStorage.removeItem('user_name'); // Hapus user name dari localStorage jika ada
+      await this.storage?.remove('customerData'); // Hapus data pelanggan dari Storage
+      this.navCtrl.navigateRoot('/login'); // Redirect ke halaman login
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  }
+
 
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
       message: message,
-      duration: 2000,
+      duration: 3000,
       color: color,
-      position: 'top'
+      position: 'top' // Tampilkan toast di bagian atas halaman
     });
-    await toast.present();
+    toast.present();
   }
 
   navigateToRiwayat() {
@@ -123,15 +106,121 @@ export class ProfilePage implements OnInit {
       this.navCtrl.navigateForward(`/riwayat/${customerId}`);
     } else {
       console.error('Customer ID not found');
-      this.presentToast('Customer ID not found.', 'danger');
     }
   }
 
-  batal() {
-    // Reset form data or any necessary actions to cancel editing
-    this.showForm = false;
-    // Optionally, reset form fields or perform other cancellation actions
-    this.password = '';
-    this.passwordConfirmation = '';
+  editProfile() {
+    this.showEditModal = true;
+    this.animateIn();
+    const element = document.querySelector('.edit-profile-card') as HTMLElement;
+    if (element) {
+      element.style.display = 'block';
+    } else {
+      console.error('Element with class .edit-profile-card not found');
+    }
   }
+
+  animateIn() {
+    const element = document.querySelector('.edit-profile-card');
+    if (element) {
+      this.animation = this.animationCtrl.create()
+        .addElement(element)
+        .duration(500)
+        .easing('ease-out')
+        .fromTo('transform', 'translateY(100%)', 'translateY(0)')
+        .fromTo('opacity', '0', '1');
+
+      this.animation.play();
+    } else {
+      console.error('Element with class .edit-profile-card not found');
+    }
+  }
+
+  cancelEdit() {
+    this.showEditModal = false;
+  }
+
+  async saveChanges() {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        });
+
+        // Menggunakan customerId untuk menentukan endpoint
+        const customerId = this.customerData.id;
+        const url = `${environment.apiUrl}/customer/update/${customerId}`;
+
+        // Tampilkan spinner loading saat menyimpan
+        await this.presentLoading();
+
+        // Kirim permintaan PUT untuk memperbarui data pelanggan
+        const response = await this.http.put<any>(url, this.customerData, { headers }).toPromise();
+        console.log('Update Success:', response);
+
+        // Perbarui local storage dengan data pelanggan yang diperbarui
+        await this.storage?.set('customerData', this.customerData);
+
+        // Sembunyikan spinner loading
+        await this.dismissLoading();
+
+        // Tampilkan toast sukses
+        this.presentToast('Profil berhasil diperbarui', 'success');
+      } else {
+        console.error('Token not found');
+      }
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+
+      // Sembunyikan spinner loading
+      await this.dismissLoading();
+
+      // Tampilkan toast error
+      this.presentToast('Gagal memperbarui profil', 'danger');
+    }
+  }
+
+  async presentLoading() {
+    this.loading = await this.loadingController.create({
+      message: 'Please wait...', // Pesan yang ditampilkan pada spinner loading
+      spinner: 'circles', // Jenis spinner yang digunakan (bisa diganti dengan 'dots', 'lines', dll)
+      translucent: true, // Membuat latar belakang loading semi-transparan
+      cssClass: 'custom-loading' // Kustomisasi tambahan untuk spinner loading
+    });
+    await this.loading.present();
+  }
+
+  async dismissLoading() {
+    if (this.loading) {
+      await this.loading.dismiss();
+    }
+  }
+
+  async presentLogoutConfirm() {
+    const alert = await this.alertController.create({
+      header: 'Konfirmasi Logout',
+      message: 'Apakah Anda yakin ingin keluar?',
+      buttons: [
+        {
+          text: 'Batal',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            console.log('Logout dibatalkan');
+          }
+        }, {
+          text: 'Keluar',
+          handler: async () => {
+            await this.logout(); // Panggil fungsi logout
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+
 }
