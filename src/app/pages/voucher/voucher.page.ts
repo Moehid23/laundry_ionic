@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { ToastController, LoadingController } from '@ionic/angular'; // tambahkan LoadingController
+import { ToastController, LoadingController } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
 import { Router } from '@angular/router';
 
@@ -15,12 +15,12 @@ export class VoucherPage implements OnInit {
   vouchers: any[] = [];
   customer: any = null;
   private storage: Storage | null = null;
-  loading: any; // variabel untuk menyimpan objek loading
+  loading: any;
 
   constructor(
     private http: HttpClient,
     private toastController: ToastController,
-    private loadingController: LoadingController, // inject LoadingController
+    private loadingController: LoadingController,
     private ionicStorage: Storage,
     private router: Router
   ) {
@@ -28,10 +28,10 @@ export class VoucherPage implements OnInit {
   }
 
   async ngOnInit() {
-    await this.presentLoading(); // tampilkan loading spinner saat memuat data
+    await this.presentLoading();
     await this.loadCustomerData();
     await this.loadVouchers();
-    await this.dismissLoading(); // tutup loading spinner setelah selesai memuat data
+    await this.dismissLoading();
   }
 
   async initStorage() {
@@ -53,9 +53,9 @@ export class VoucherPage implements OnInit {
 
   async fetchCustomerData() {
     try {
-      const token = localStorage.getItem('login_token');
-      if (token) {
-        const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+      const accessToken = localStorage.getItem('access_token');
+      if (accessToken) {
+        const headers = new HttpHeaders({ 'Authorization': `Bearer ${accessToken}` });
         const url = `${environment.apiUrl}/customer`;
 
         const response = await this.http.get<any>(url, { headers }).toPromise();
@@ -63,7 +63,7 @@ export class VoucherPage implements OnInit {
         this.customer = response.data;
         await this.storage?.set('customerData', response.data);
       } else {
-        console.error('Token not found');
+        console.error('Access token not found');
       }
     } catch (error) {
       console.error('Failed to fetch customer data', error);
@@ -85,9 +85,9 @@ export class VoucherPage implements OnInit {
 
   async fetchVouchersData() {
     try {
-      const token = localStorage.getItem('login_token');
-      if (token) {
-        const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+      const accessToken = localStorage.getItem('access_token');
+      if (accessToken) {
+        const headers = new HttpHeaders({ 'Authorization': `Bearer ${accessToken}` });
         const url = `${environment.apiUrl}/vouchers`;
 
         const response = await this.http.get<any>(url, { headers }).toPromise();
@@ -95,7 +95,7 @@ export class VoucherPage implements OnInit {
         this.vouchers = response.data;
         await this.storage?.set('vouchersData', response.data);
       } else {
-        console.error('Token not found');
+        console.error('Access token not found');
       }
     } catch (error) {
       console.error('Failed to fetch vouchers data', error);
@@ -105,11 +105,11 @@ export class VoucherPage implements OnInit {
   async claimVoucher(voucherId: number, pointsRequired: number) {
     try {
       if (this.customer && this.customer.points >= pointsRequired) {
-        await this.presentLoading(); // tampilkan loading spinner sebelum mengklaim voucher
+        await this.presentLoading();
 
-        const token = localStorage.getItem('login_token');
-        if (token) {
-          const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+        const accessToken = localStorage.getItem('access_token');
+        if (accessToken) {
+          const headers = new HttpHeaders({ 'Authorization': `Bearer ${accessToken}` });
           const url = `${environment.apiUrl}/claim-voucher/${voucherId}`;
 
           const response = await this.http.post<any>(url, {}, { headers }).toPromise();
@@ -120,10 +120,10 @@ export class VoucherPage implements OnInit {
 
           this.presentToast('Voucher berhasil diclaim', 'success');
         } else {
-          console.error('Token not found');
+          console.error('Access token not found');
         }
 
-        await this.dismissLoading(); // tutup loading spinner setelah mengklaim voucher
+        await this.dismissLoading();
       } else {
         console.error('Not enough points to claim this voucher');
         this.presentToast('Point Anda tidak mencukupi untuk melakukan klaim voucher', 'danger');
@@ -131,16 +131,16 @@ export class VoucherPage implements OnInit {
     } catch (error) {
       console.error('Failed to claim voucher', error);
       this.presentToast('Gagal melakukan klaim voucher', 'danger');
-      await this.dismissLoading(); // pastikan loading spinner ditutup jika terjadi error
+      await this.dismissLoading();
     }
   }
 
   async presentLoading() {
     this.loading = await this.loadingController.create({
-      message: 'Please wait...', // pesan yang akan ditampilkan pada loading spinner
-      spinner: 'circles', // jenis spinner yang digunakan (bisa diganti dengan 'dots', 'lines', dll)
-      translucent: true, // membuat background loading semi-transparan
-      cssClass: 'custom-loading' // kustomisasi tambahan untuk loading spinner
+      message: 'Please wait...',
+      spinner: 'circles',
+      translucent: true,
+      cssClass: 'custom-loading'
     });
     await this.loading.present();
   }
