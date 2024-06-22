@@ -32,8 +32,9 @@ export class LoginPage {
     this.http.post<any>(url, this.loginData)
       .subscribe(
         async (response) => {
-          if (response && response.access_token) {
+          if (response && response.access_token && response.refresh_token) {
             localStorage.setItem('access_token', response.access_token);
+            localStorage.setItem('refresh_token', response.refresh_token);
             await this.showToast('Login berhasil', 'success');
             this.router.navigateByUrl('/home');
           } else {

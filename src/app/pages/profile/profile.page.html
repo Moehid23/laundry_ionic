@@ -42,6 +42,7 @@
 </ion-content>
 
 <!-- Kartu Profil untuk Edit -->
+<div class="edit-profile-card" #editProfileCard>
     <ion-card *ngIf="showEditModal" class="edit-profile-card" [@slideInOut]>
     <ion-card-content>
       <ion-item>
@@ -64,7 +65,7 @@
       </ion-button>
     </ion-card-content>
   </ion-card>
-
+</div>
 
 <!-- FAB dan Footer -->
 <div class="fab-tab" style="position: relative;">
@@ -254,7 +255,7 @@ ion-content {
 
 .edit-profile-card {
   position: absolute;
-  bottom: 100px;
+  bottom: 40px;
   left: 0;
   right: 0;
   margin: 20px;

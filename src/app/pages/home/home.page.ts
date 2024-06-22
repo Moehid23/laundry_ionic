@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { NavController, ToastController, LoadingController } from '@ionic/angular'; // tambahkan LoadingController
+import { NavController, ToastController, LoadingController } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment';
 
@@ -16,7 +16,7 @@ export class HomePage implements OnInit {
   customerData: any = {};
   latestResiData: any = null;
   private storage: Storage | null = null;
-  loading: any; // variabel untuk menyimpan objek loading
+  loading: any;
 
   images = [
     '../../assets/1.jpg',
@@ -29,15 +29,15 @@ export class HomePage implements OnInit {
     private http: HttpClient,
     private navCtrl: NavController,
     private toastCtrl: ToastController,
-    private loadingController: LoadingController // tambahkan LoadingController
+    private loadingController: LoadingController
   ) { }
 
   async ngOnInit() {
-    await this.initStorage(); // Initialize Ionic Storage
-    await this.presentLoading(); // tampilkan loading spinner saat memuat data
-    this.loadUserName(); // Memuat nama pengguna dari localStorage
-    await this.loadCustomerData(); // Memuat data pelanggan dari API
-    await this.dismissLoading(); // tutup loading spinner setelah selesai memuat data
+    await this.initStorage();
+    await this.presentLoading();
+    this.loadUserName();
+    await this.loadCustomerData();
+    await this.dismissLoading();
   }
 
   async initStorage() {
@@ -65,15 +65,18 @@ export class HomePage implements OnInit {
     }
   }
 
-  // home.page.ts
   async fetchCustomerData() {
     try {
-      const token = localStorage.getItem('access_token'); if (token) {
+      let token = localStorage.getItem('access_token');
+      if (!token) {
+        token = await this.refreshToken();
+      }
+
+      if (token) {
         const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
         const url = `${environment.apiUrl}/customer`;
 
         const response = await this.http.get<any>(url, { headers }).toPromise();
-        console.log('Customer Data:', response);
         this.customerData = response.data;
         localStorage.setItem('customer_id', response.data.id);
         await this.storage?.set('customerData', response.data);
@@ -85,6 +88,28 @@ export class HomePage implements OnInit {
     }
   }
 
+  async refreshToken() {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (!refreshToken) {
+      return null;
+    }
+
+    const url = `${environment.apiUrl}/refresh`;
+    try {
+      const response = await this.http.post<any>(url, { refresh_token: refreshToken }).toPromise();
+      if (response && response.access_token && response.refresh_token) {
+        localStorage.setItem('access_token', response.access_token);
+        localStorage.setItem('refresh_token', response.refresh_token);
+        return response.access_token;
+      } else {
+        this.navCtrl.navigateBack('/login');
+        return null;
+      }
+    } catch (error) {
+      this.navCtrl.navigateBack('/login');
+      return null;
+    }
+  }
 
   previousImage() {
     if (this.currentIndex > 0) {
@@ -110,13 +135,13 @@ export class HomePage implements OnInit {
       return;
     }
 
-    await this.presentLoading(); // tampilkan loading spinner saat memuat data resi
+    await this.presentLoading();
 
     this.storage?.get(`resiData_${this.resiNumber}`).then(data => {
       if (data) {
         this.resiData = data;
         this.latestResiData = this.getLatestResiData(data);
-        this.dismissLoading(); // tutup loading spinner setelah selesai memuat data resi
+        this.dismissLoading();
       } else {
         this.fetchResiData();
       }
@@ -124,7 +149,7 @@ export class HomePage implements OnInit {
   }
 
   fetchResiData() {
-    const token = localStorage.getItem('login_token');
+    const token = localStorage.getItem('access_token');
     if (token) {
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
       const url = `${environment.apiUrl}/resi/${this.resiNumber}`;
@@ -134,32 +159,27 @@ export class HomePage implements OnInit {
           this.resiData = response.data;
           this.latestResiData = this.getLatestResiData(response.data);
           this.storage?.set(`resiData_${this.resiNumber}`, response.data);
-          this.resiData = response.data;
-          this.latestResiData = this.getLatestResiData(response.data);
-          // Komentari atau hapus kode berikut agar tidak menyimpan ke lokal storage:
-          // this.storage?.set(`resiData_${this.resiNumber}`, response.data);
-
-          this.dismissLoading(); // tutup loading spinner setelah selesai memuat data resi
+          this.dismissLoading();
         },
         (error) => {
           console.error('Failed to fetch resi data', error);
           this.presentToast('Nomor resi tidak ditemukan atau terjadi kesalahan');
-          this.dismissLoading(); // tutup loading spinner jika terjadi error
+          this.dismissLoading();
         }
       );
     } else {
       console.error('Token not found in localStorage');
       this.presentToast('Anda perlu login untuk melanjutkan');
-      this.dismissLoading(); // tutup loading spinner jika terjadi error
+      this.dismissLoading();
     }
   }
 
   async presentLoading() {
     this.loading = await this.loadingController.create({
-      message: 'Please wait...', // pesan yang akan ditampilkan pada loading spinner
-      spinner: 'circles', // jenis spinner yang digunakan (bisa diganti dengan 'dots', 'lines', dll)
-      translucent: true, // membuat background loading semi-transparan
-      cssClass: 'custom-loading' // kustomisasi tambahan untuk loading spinner
+      message: 'Please wait...',
+      spinner: 'circles',
+      translucent: true,
+      cssClass: 'custom-loading'
     });
     await this.loading.present();
   }
@@ -214,5 +234,4 @@ export class HomePage implements OnInit {
     const date = new Date(timestamp);
     return date.toLocaleDateString();
   }
-
 }

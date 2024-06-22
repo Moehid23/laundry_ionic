@@ -1,25 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ToastController, NavController, LoadingController } from '@ionic/angular';
+import { ToastController, NavController, LoadingController, AlertController } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment';
 import { AnimationController, Animation } from '@ionic/angular';
-import { AlertController } from '@ionic/angular';
-
-
+import { trigger, transition, style, animate } from '@angular/animations'; // Import animasi dari Angular
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
-
+  animations: [
+    trigger('slideInOut', [
+      transition(':enter', [
+        style({ transform: 'translateY(100%)', opacity: 0 }),
+        animate('500ms ease-out', style({ transform: 'translateY(0)', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in', style({ transform: 'translateY(100%)', opacity: 0 }))
+      ])
+    ])
+  ]
 })
-export class ProfilePage implements OnInit {
+export class ProfilePage implements OnInit, AfterViewInit {
   customerData: any = {};
   private storage: Storage | null = null;
   showEditModal = false;
   animation: Animation | undefined;
   loading: HTMLIonLoadingElement | null = null;
+
+  @ViewChild('editProfileCard', { static: false }) editProfileCard: ElementRef | undefined;
 
   constructor(
     private http: HttpClient,
@@ -28,8 +38,7 @@ export class ProfilePage implements OnInit {
     private animationCtrl: AnimationController,
     private storageService: Storage,
     private loadingController: LoadingController,
-    private alertController: AlertController // Tambahkan ini
-
+    private alertController: AlertController
   ) { }
 
   async ngOnInit() {
@@ -38,6 +47,12 @@ export class ProfilePage implements OnInit {
       await this.loadCustomerData();
     } catch (error) {
       console.error('Error in ngOnInit:', error);
+    }
+  }
+
+  async ngAfterViewInit() {
+    if (this.showEditModal) {
+      this.animateIn();
     }
   }
 
@@ -74,28 +89,29 @@ export class ProfilePage implements OnInit {
       }
     } catch (error) {
       console.error('Failed to fetch customer data', error);
+      this.presentToast('Gagal memuat data pelanggan', 'danger');
     }
   }
-  // profile.page.ts
+
   async logout() {
     try {
-      localStorage.removeItem('access_token'); // Hapus token dari localStorage
-      localStorage.removeItem('customer_id'); // Hapus customer ID dari localStorage jika ada
-      localStorage.removeItem('user_name'); // Hapus user name dari localStorage jika ada
-      await this.storage?.remove('customerData'); // Hapus data pelanggan dari Storage
-      this.navCtrl.navigateRoot('/login'); // Redirect ke halaman login
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('customer_id');
+      localStorage.removeItem('user_name');
+      await this.storage?.remove('customerData');
+      this.navCtrl.navigateRoot('/login');
     } catch (error) {
       console.error('Error logging out:', error);
     }
   }
-
 
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
       message: message,
       duration: 3000,
       color: color,
-      position: 'top' // Tampilkan toast di bagian atas halaman
+      position: 'top'
     });
     toast.present();
   }
@@ -112,19 +128,12 @@ export class ProfilePage implements OnInit {
   editProfile() {
     this.showEditModal = true;
     this.animateIn();
-    const element = document.querySelector('.edit-profile-card') as HTMLElement;
-    if (element) {
-      element.style.display = 'block';
-    } else {
-      console.error('Element with class .edit-profile-card not found');
-    }
   }
 
   animateIn() {
-    const element = document.querySelector('.edit-profile-card');
-    if (element) {
+    if (this.editProfileCard && this.editProfileCard.nativeElement) {
       this.animation = this.animationCtrl.create()
-        .addElement(element)
+        .addElement(this.editProfileCard.nativeElement)
         .duration(500)
         .easing('ease-out')
         .fromTo('transform', 'translateY(100%)', 'translateY(0)')
@@ -149,24 +158,18 @@ export class ProfilePage implements OnInit {
           'Content-Type': 'application/json'
         });
 
-        // Menggunakan customerId untuk menentukan endpoint
         const customerId = this.customerData.id;
         const url = `${environment.apiUrl}/customer/update/${customerId}`;
 
-        // Tampilkan spinner loading saat menyimpan
         await this.presentLoading();
 
-        // Kirim permintaan PUT untuk memperbarui data pelanggan
         const response = await this.http.put<any>(url, this.customerData, { headers }).toPromise();
         console.log('Update Success:', response);
 
-        // Perbarui local storage dengan data pelanggan yang diperbarui
         await this.storage?.set('customerData', this.customerData);
 
-        // Sembunyikan spinner loading
         await this.dismissLoading();
 
-        // Tampilkan toast sukses
         this.presentToast('Profil berhasil diperbarui', 'success');
       } else {
         console.error('Token not found');
@@ -174,20 +177,18 @@ export class ProfilePage implements OnInit {
     } catch (error) {
       console.error('Failed to update profile:', error);
 
-      // Sembunyikan spinner loading
       await this.dismissLoading();
 
-      // Tampilkan toast error
       this.presentToast('Gagal memperbarui profil', 'danger');
     }
   }
 
   async presentLoading() {
     this.loading = await this.loadingController.create({
-      message: 'Please wait...', // Pesan yang ditampilkan pada spinner loading
-      spinner: 'circles', // Jenis spinner yang digunakan (bisa diganti dengan 'dots', 'lines', dll)
-      translucent: true, // Membuat latar belakang loading semi-transparan
-      cssClass: 'custom-loading' // Kustomisasi tambahan untuk spinner loading
+      message: 'Please wait...',
+      spinner: 'circles',
+      translucent: true,
+      cssClass: 'custom-loading'
     });
     await this.loading.present();
   }
@@ -213,7 +214,7 @@ export class ProfilePage implements OnInit {
         }, {
           text: 'Keluar',
           handler: async () => {
-            await this.logout(); // Panggil fungsi logout
+            await this.logout();
           }
         }
       ]
@@ -221,6 +222,4 @@ export class ProfilePage implements OnInit {
 
     await alert.present();
   }
-
-
 }
