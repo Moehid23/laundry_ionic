@@ -41,10 +41,10 @@
 </ion-card>
 </ion-content>
 
-<!-- Kartu Profil untuk Edit -->
 <div class="edit-profile-card" #editProfileCard>
-    <ion-card *ngIf="showEditModal" class="edit-profile-card" [@slideInOut]>
+  <ion-card *ngIf="showEditModal" class="edit-profile-card" [@slideInOut]>
     <ion-card-content>
+      <h1 style="text-align: center;">Edit Profil</h1> <!-- Menambahkan h1 di tengah -->
       <ion-item>
         <ion-label position="floating">Nama</ion-label>
         <ion-input [(ngModel)]="customerData.name"></ion-input>
@@ -57,15 +57,28 @@
         <ion-label position="floating">Nomor Telepon</ion-label>
         <ion-input [(ngModel)]="customerData.contact"></ion-input>
       </ion-item>
+<ion-item>
+  <ion-label position="floating">Password Baru</ion-label>
+  <ion-input id="password" type="password" [(ngModel)]="password" clearInput="true">  <ion-icon name="eye" slot="end" (click)="togglePasswordVisibility('password')"></ion-icon></ion-input>
+</ion-item>
+<ion-item>
+  <ion-label position="floating">Konfirmasi Password Baru</ion-label>
+  <ion-input id="password_confirmation" type="password" [(ngModel)]="password_confirmation" clearInput="true"><ion-icon name="eye" slot="end" (click)="togglePasswordVisibility('password_confirmation')"></ion-icon></ion-input>
+</ion-item>
+
+
+      <!-- Tombol untuk menyimpan perubahan -->
       <ion-button expand="block" (click)="saveChanges()" style="--background: green;">
         Simpan Perubahan
       </ion-button>
+      <!-- Tombol untuk membatalkan edit -->
       <ion-button expand="block" fill="clear" (click)="cancelEdit()">
         Batal
       </ion-button>
     </ion-card-content>
   </ion-card>
 </div>
+
 
 <!-- FAB dan Footer -->
 <div class="fab-tab" style="position: relative;">

@@ -1,10 +1,10 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { ToastController, NavController, LoadingController, AlertController } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment';
 import { AnimationController, Animation } from '@ionic/angular';
-import { trigger, transition, style, animate } from '@angular/animations'; // Import animasi dari Angular
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-profile',
@@ -28,6 +28,8 @@ export class ProfilePage implements OnInit, AfterViewInit {
   showEditModal = false;
   animation: Animation | undefined;
   loading: HTMLIonLoadingElement | null = null;
+  password: string = ''; // Property password
+  password_confirmation: string = ''; // Property password_confirmation
 
   @ViewChild('editProfileCard', { static: false }) editProfileCard: ElementRef | undefined;
 
@@ -147,6 +149,8 @@ export class ProfilePage implements OnInit, AfterViewInit {
 
   cancelEdit() {
     this.showEditModal = false;
+    this.password = ''; // Reset password fields when canceling edit
+    this.password_confirmation = '';
   }
 
   async saveChanges() {
@@ -158,12 +162,18 @@ export class ProfilePage implements OnInit, AfterViewInit {
           'Content-Type': 'application/json'
         });
 
-        const customerId = this.customerData.id;
-        const url = `${environment.apiUrl}/customer/update/${customerId}`;
+        const url = `${environment.apiUrl}/customer`;
+
+        // Prepare data to send including password fields
+        const dataToSend = {
+          ...this.customerData,
+          password: this.password,
+          password_confirmation: this.password_confirmation
+        };
 
         await this.presentLoading();
 
-        const response = await this.http.put<any>(url, this.customerData, { headers }).toPromise();
+        const response = await this.http.put<any>(url, dataToSend, { headers }).toPromise();
         console.log('Update Success:', response);
 
         await this.storage?.set('customerData', this.customerData);
@@ -179,7 +189,17 @@ export class ProfilePage implements OnInit, AfterViewInit {
 
       await this.dismissLoading();
 
-      this.presentToast('Gagal memperbarui profil', 'danger');
+      // Handle specific error case where status is 422 and there are errors in the response
+      if (error instanceof HttpErrorResponse && error.status === 422 && error.error && error.error.errors) {
+        const errorMessage = this.getFirstErrorMessage(error.error.errors);
+        if (errorMessage) {
+          this.presentToast(errorMessage, 'danger');
+        } else {
+          this.presentToast('Gagal memperbarui profil', 'danger');
+        }
+      } else {
+        this.presentToast('Gagal memperbarui profil', 'danger');
+      }
     }
   }
 
@@ -221,5 +241,24 @@ export class ProfilePage implements OnInit, AfterViewInit {
     });
 
     await alert.present();
+  }
+
+  private getFirstErrorMessage(errors: any): string | null {
+    for (const key of Object.keys(errors)) {
+      const fieldErrors = errors[key];
+      if (Array.isArray(fieldErrors) && fieldErrors.length > 0) {
+        return fieldErrors[0];
+      }
+    }
+    return null;
+  }
+
+  togglePasswordVisibility(field: 'password' | 'password_confirmation') {
+    const inputField = document.getElementById(field) as HTMLInputElement;
+    if (inputField.type === 'password') {
+      inputField.type = 'text';
+    } else {
+      inputField.type = 'password';
+    }
   }
 }

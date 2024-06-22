@@ -10,9 +10,9 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./home.page.scss'],
 })
 export class HomePage implements OnInit {
-  resiNumber: string = '';
+  resiNumber = '';
   resiData: any[] = [];
-  userName: string = '';
+  userName = '';
   customerData: any = {};
   latestResiData: any = null;
   private storage: Storage | null = null;
@@ -32,21 +32,22 @@ export class HomePage implements OnInit {
     private loadingController: LoadingController
   ) { }
 
-  async ngOnInit() {
-    await this.initStorage();
-    await this.presentLoading();
-    this.loadUserName();
-    await this.loadCustomerData();
-    await this.dismissLoading();
+  ngOnInit() {
+    this.initStorage().then(() => {
+      this.loadUserName();
+      this.loadCustomerData();
+    }).finally(() => {
+      this.dismissLoading();
+    });
   }
 
   async initStorage() {
-    this.storage = await new Storage().create();
+    this.storage = await this.storage || await new Storage().create();
   }
 
   loadUserName() {
     const storedUserName = localStorage.getItem('user_name');
-    if (storedUserName !== null) {
+    if (storedUserName) {
       this.userName = storedUserName;
     }
   }
@@ -67,10 +68,7 @@ export class HomePage implements OnInit {
 
   async fetchCustomerData() {
     try {
-      let token = localStorage.getItem('access_token');
-      if (!token) {
-        token = await this.refreshToken();
-      }
+      let token = localStorage.getItem('access_token') || await this.refreshToken();
 
       if (token) {
         const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
@@ -89,43 +87,36 @@ export class HomePage implements OnInit {
   }
 
   async refreshToken() {
-    const refreshToken = localStorage.getItem('refresh_token');
-    if (!refreshToken) {
-      return null;
-    }
-
-    const url = `${environment.apiUrl}/refresh`;
     try {
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (!refreshToken) {
+        throw new Error('No refresh token found');
+      }
+
+      const url = `${environment.apiUrl}/refresh`;
       const response = await this.http.post<any>(url, { refresh_token: refreshToken }).toPromise();
-      if (response && response.access_token && response.refresh_token) {
+
+      if (response.access_token && response.refresh_token) {
         localStorage.setItem('access_token', response.access_token);
         localStorage.setItem('refresh_token', response.refresh_token);
         return response.access_token;
       } else {
-        this.navCtrl.navigateBack('/login');
-        return null;
+        throw new Error('Invalid response from refresh endpoint');
       }
     } catch (error) {
+      console.error('Error refreshing token:', error);
       this.navCtrl.navigateBack('/login');
       return null;
     }
   }
 
   previousImage() {
-    if (this.currentIndex > 0) {
-      this.currentIndex--;
-    } else {
-      this.currentIndex = this.images.length - 1;
-    }
+    this.currentIndex = (this.currentIndex + this.images.length - 1) % this.images.length;
     console.log('Previous image:', this.currentIndex);
   }
 
   nextImage() {
-    if (this.currentIndex < this.images.length - 1) {
-      this.currentIndex++;
-    } else {
-      this.currentIndex = 0;
-    }
+    this.currentIndex = (this.currentIndex + 1) % this.images.length;
     console.log('Next image:', this.currentIndex);
   }
 
@@ -141,37 +132,40 @@ export class HomePage implements OnInit {
       if (data) {
         this.resiData = data;
         this.latestResiData = this.getLatestResiData(data);
-        this.dismissLoading();
       } else {
         this.fetchResiData();
       }
+    }).finally(() => {
+      this.dismissLoading();
     });
   }
 
   fetchResiData() {
     const token = localStorage.getItem('access_token');
-    if (token) {
-      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-      const url = `${environment.apiUrl}/resi/${this.resiNumber}`;
-
-      this.http.get<any>(url, { headers }).subscribe(
-        (response) => {
-          this.resiData = response.data;
-          this.latestResiData = this.getLatestResiData(response.data);
-          this.storage?.set(`resiData_${this.resiNumber}`, response.data);
-          this.dismissLoading();
-        },
-        (error) => {
-          console.error('Failed to fetch resi data', error);
-          this.presentToast('Nomor resi tidak ditemukan atau terjadi kesalahan');
-          this.dismissLoading();
-        }
-      );
-    } else {
+    if (!token) {
       console.error('Token not found in localStorage');
       this.presentToast('Anda perlu login untuk melanjutkan');
       this.dismissLoading();
+      return;
     }
+
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+    const url = `${environment.apiUrl}/resi/${this.resiNumber}`;
+
+    this.http.get<any>(url, { headers }).subscribe(
+      (response) => {
+        this.resiData = response.data;
+        this.latestResiData = this.getLatestResiData(response.data);
+        this.storage?.set(`resiData_${this.resiNumber}`, response.data);
+      },
+      (error) => {
+        console.error('Failed to fetch resi data', error);
+        this.presentToast('Nomor resi tidak ditemukan atau terjadi kesalahan');
+      },
+      () => {
+        this.dismissLoading();
+      }
+    );
   }
 
   async presentLoading() {
@@ -225,13 +219,10 @@ export class HomePage implements OnInit {
       return null;
     }
 
-    data.sort((a, b) => new Date(b.changed_at).getTime() - new Date(a.changed_at).getTime());
-
-    return data[0];
+    return data.reduce((prev, current) => (new Date(prev.changed_at) > new Date(current.changed_at)) ? prev : current);
   }
 
   formatDate(timestamp: string): string {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString();
+    return new Date(timestamp).toLocaleDateString();
   }
 }
