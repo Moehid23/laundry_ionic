@@ -131,10 +131,14 @@ export class HomePage implements OnInit {
 
       this.http.get<any>(url, { headers }).subscribe(
         (response) => {
-          console.log('Resi Data:', response);
           this.resiData = response.data;
           this.latestResiData = this.getLatestResiData(response.data);
           this.storage?.set(`resiData_${this.resiNumber}`, response.data);
+          this.resiData = response.data;
+          this.latestResiData = this.getLatestResiData(response.data);
+          // Komentari atau hapus kode berikut agar tidak menyimpan ke lokal storage:
+          // this.storage?.set(`resiData_${this.resiNumber}`, response.data);
+
           this.dismissLoading(); // tutup loading spinner setelah selesai memuat data resi
         },
         (error) => {
