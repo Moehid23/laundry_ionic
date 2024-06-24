@@ -11,7 +11,6 @@ import { Router } from '@angular/router';
   styleUrls: ['./voucher.page.scss'],
 })
 export class VoucherPage implements OnInit {
-
   vouchers: any[] = [];
   customer: any = null;
   private storage: Storage | null = null;
@@ -28,10 +27,10 @@ export class VoucherPage implements OnInit {
   }
 
   async ngOnInit() {
-    await this.presentLoading();
+    await this.presentLoading(); // Tampilkan loading spinner saat halaman dimuat
     await this.loadCustomerData();
     await this.loadVouchers();
-    await this.dismissLoading();
+    await this.dismissLoading(); // Sembunyikan loading spinner setelah data dimuat
   }
 
   async initStorage() {
@@ -169,5 +168,4 @@ export class VoucherPage implements OnInit {
       console.error('Customer ID not found');
     }
   }
-
 }

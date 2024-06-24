@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RiwayatPage } from './riwayat.page';
 
+
 describe('RiwayatPage', () => {
   let component: RiwayatPage;
   let fixture: ComponentFixture<RiwayatPage>;

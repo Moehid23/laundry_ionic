@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment';
-import { LoadingController } from '@ionic/angular'; // tambahkan LoadingController
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-riwayat',
@@ -13,32 +13,36 @@ import { LoadingController } from '@ionic/angular'; // tambahkan LoadingControll
 export class RiwayatPage implements OnInit {
   customerId: string = '';
   transactions: any[] = [];
+  filteredTransactions: any[] = [];
+  endDate: string = '';
   private storage: Storage | null = null;
-  loading: any; // variabel untuk menyimpan objek loading
+  startDate: string = ''; // Deklarasikan properti startDate
+  loading: any;
 
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
-    private loadingController: LoadingController // tambahkan LoadingController
+    private loadingController: LoadingController
   ) { }
 
   async ngOnInit() {
-    await this.initStorage(); // Initialize Ionic Storage
-    await this.presentLoading(); // tampilkan loading spinner saat memuat data
+    await this.initStorage();
+    await this.presentLoading();
     this.customerId = this.route.snapshot.paramMap.get('customerId') || '';
-    await this.loadTransactions(); // Memuat transaksi dari penyimpanan lokal atau API
-    await this.dismissLoading(); // tutup loading spinner setelah selesai memuat data
+    await this.loadTransactions();
+    await this.dismissLoading();
   }
 
   async initStorage() {
-    this.storage = await new Storage().create(); // Create Ionic Storage instance
+    this.storage = await new Storage().create();
   }
 
   async loadTransactions() {
     try {
-      const data = await this.storage?.get('transactions');
+      const data = await this.storage?.get(`transactions_${this.customerId}`);
       if (data) {
         this.transactions = data;
+        this.filteredTransactions = data;
       } else {
         await this.fetchTransactions();
       }
@@ -48,7 +52,7 @@ export class RiwayatPage implements OnInit {
   }
 
   async fetchTransactions() {
-    const token = localStorage.getItem('login_token');
+    const token = localStorage.getItem('access_token');
     if (token && this.customerId) {
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
       const url = `${environment.apiUrl}/transaksi/${this.customerId}`;
@@ -56,8 +60,9 @@ export class RiwayatPage implements OnInit {
       try {
         const response = await this.http.get<any>(url, { headers }).toPromise();
         console.log('Transaction Data:', response);
-        this.transactions = response.data; // Set data to component
-        await this.storage?.set('transactions', response.data); // Save to storage
+        this.transactions = response.data;
+        this.filteredTransactions = response.data;
+        await this.storage?.set(`transactions_${this.customerId}`, response.data);
       } catch (error) {
         console.error('Failed to fetch transaction data', error);
       }
@@ -68,10 +73,10 @@ export class RiwayatPage implements OnInit {
 
   async presentLoading() {
     this.loading = await this.loadingController.create({
-      message: 'Please wait...', // pesan yang akan ditampilkan pada loading spinner
-      spinner: 'circles', // jenis spinner yang digunakan (bisa diganti dengan 'dots', 'lines', dll)
-      translucent: true, // membuat background loading semi-transparan
-      cssClass: 'custom-loading' // kustomisasi tambahan untuk loading spinner
+      message: 'Please wait...',
+      spinner: 'circles',
+      translucent: true,
+      cssClass: 'custom-loading'
     });
     await this.loading.present();
   }
@@ -102,4 +107,17 @@ export class RiwayatPage implements OnInit {
     }
   }
 
+  filterByDate() {
+    if (this.startDate) {
+      const start = new Date(this.startDate);
+
+      this.filteredTransactions = this.transactions.filter(transaction => {
+        const transactionDate = new Date(transaction.updated_at);
+        // Bandingkan hanya dengan tanggal
+        return transactionDate.toDateString() === start.toDateString();
+      });
+    } else {
+      this.filteredTransactions = this.transactions;
+    }
+  }
 }
