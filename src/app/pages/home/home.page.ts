@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NavController, ToastController, LoadingController } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment';
+import * as CryptoJS from 'crypto-js'; // Import CryptoJS
 
 @Component({
   selector: 'app-home',
@@ -68,19 +69,23 @@ export class HomePage implements OnInit {
 
   async fetchCustomerData() {
     try {
-      let token = localStorage.getItem('access_token') || await this.refreshToken();
-
-      if (token) {
-        const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-        const url = `${environment.apiUrl}/customer`;
-
-        const response = await this.http.get<any>(url, { headers }).toPromise();
-        this.customerData = response.data;
-        localStorage.setItem('customer_id', response.data.id);
-        await this.storage?.set('customerData', response.data);
-      } else {
-        console.error('Token not found');
+      let encryptedToken = localStorage.getItem('access_token');
+      if (!encryptedToken) {
+        console.error('Token not found in localStorage');
+        this.navCtrl.navigateBack('/login');
+        return;
       }
+
+      // Decrypt token before using it
+      let token = this.decryptToken(encryptedToken);
+
+      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+      const url = `${environment.apiUrl}/customer`;
+
+      const response = await this.http.get<any>(url, { headers }).toPromise();
+      this.customerData = response.data;
+      localStorage.setItem('customer_id', response.data.id);
+      await this.storage?.set('customerData', response.data);
     } catch (error) {
       console.error('Failed to fetch customer data', error);
     }
@@ -108,64 +113,6 @@ export class HomePage implements OnInit {
       this.navCtrl.navigateBack('/login');
       return null;
     }
-  }
-
-  previousImage() {
-    this.currentIndex = (this.currentIndex + this.images.length - 1) % this.images.length;
-    console.log('Previous image:', this.currentIndex);
-  }
-
-  nextImage() {
-    this.currentIndex = (this.currentIndex + 1) % this.images.length;
-    console.log('Next image:', this.currentIndex);
-  }
-
-  async checkResi() {
-    if (!this.resiNumber.trim()) {
-      this.presentToast('Masukkan nomor resi terlebih dahulu');
-      return;
-    }
-
-    await this.presentLoading();
-
-    this.storage?.get(`resiData_${this.resiNumber}`).then(data => {
-      if (data) {
-        this.resiData = data;
-        this.latestResiData = this.getLatestResiData(data);
-      } else {
-        this.fetchResiData();
-      }
-    }).finally(() => {
-      this.dismissLoading();
-    });
-  }
-
-  fetchResiData() {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      console.error('Token not found in localStorage');
-      this.presentToast('Anda perlu login untuk melanjutkan');
-      this.dismissLoading();
-      return;
-    }
-
-    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-    const url = `${environment.apiUrl}/resi/${this.resiNumber}`;
-
-    this.http.get<any>(url, { headers }).subscribe(
-      (response) => {
-        this.resiData = response.data;
-        this.latestResiData = this.getLatestResiData(response.data);
-        this.storage?.set(`resiData_${this.resiNumber}`, response.data);
-      },
-      (error) => {
-        console.error('Failed to fetch resi data', error);
-        this.presentToast('Nomor resi tidak ditemukan atau terjadi kesalahan');
-      },
-      () => {
-        this.dismissLoading();
-      }
-    );
   }
 
   async presentLoading() {
@@ -224,5 +171,67 @@ export class HomePage implements OnInit {
 
   formatDate(timestamp: string): string {
     return new Date(timestamp).toLocaleDateString();
+  }
+
+  decryptToken(encryptedToken: string): string {
+    return CryptoJS.AES.decrypt(encryptedToken, 'secret_key').toString(CryptoJS.enc.Utf8);
+  }
+
+  previousImage() {
+    this.currentIndex = (this.currentIndex + this.images.length - 1) % this.images.length;
+    console.log('Previous image:', this.currentIndex);
+  }
+
+  nextImage() {
+    this.currentIndex = (this.currentIndex + 1) % this.images.length;
+    console.log('Next image:', this.currentIndex);
+  }
+
+  async checkResi() {
+    if (!this.resiNumber.trim()) {
+      this.presentToast('Masukkan nomor resi terlebih dahulu');
+      return;
+    }
+
+    await this.presentLoading();
+
+    this.storage?.get(`resiData_${this.resiNumber}`).then(data => {
+      if (data) {
+        this.resiData = data;
+        this.latestResiData = this.getLatestResiData(data);
+      } else {
+        this.fetchResiData();
+      }
+    }).finally(() => {
+      this.dismissLoading();
+    });
+  }
+
+  fetchResiData() {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      console.error('Token not found in localStorage');
+      this.presentToast('Anda perlu login untuk melanjutkan');
+      this.dismissLoading();
+      return;
+    }
+
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+    const url = `${environment.apiUrl}/resi/${this.resiNumber}`;
+
+    this.http.get<any>(url, { headers }).subscribe(
+      (response) => {
+        this.resiData = response.data;
+        this.latestResiData = this.getLatestResiData(response.data);
+        this.storage?.set(`resiData_${this.resiNumber}`, response.data);
+      },
+      (error) => {
+        console.error('Failed to fetch resi data', error);
+        this.presentToast('Nomor resi tidak ditemukan atau terjadi kesalahan');
+      },
+      () => {
+        this.dismissLoading();
+      }
+    );
   }
 }

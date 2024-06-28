@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { environment } from '../../../environments/environment';
+import * as CryptoJS from 'crypto-js'; // Import CryptoJS
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,7 @@ export class LoginPage {
     private toastController: ToastController
   ) { }
 
-  login() {
+  async login() {
     if (!this.loginData.email || !this.loginData.password) {
       this.showToast('Email dan password harus diisi', 'danger');
       return;
@@ -33,8 +34,13 @@ export class LoginPage {
       .subscribe(
         async (response) => {
           if (response && response.access_token && response.refresh_token) {
-            localStorage.setItem('access_token', response.access_token);
-            localStorage.setItem('refresh_token', response.refresh_token);
+            // Encrypt tokens before storing
+            const encryptedAccessToken = this.encryptToken(response.access_token);
+            const encryptedRefreshToken = this.encryptToken(response.refresh_token);
+
+            localStorage.setItem('access_token', encryptedAccessToken);
+            localStorage.setItem('refresh_token', encryptedRefreshToken);
+
             await this.showToast('Login berhasil', 'success');
             this.router.navigateByUrl('/home');
           } else {
@@ -45,6 +51,10 @@ export class LoginPage {
           await this.showToast('Login gagal. Periksa kembali email dan password Anda.', 'danger');
         }
       );
+  }
+
+  encryptToken(token: string): string {
+    return CryptoJS.AES.encrypt(token.trim(), 'secret_key').toString();
   }
 
   async showToast(message: string, color: string) {
