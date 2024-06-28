@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://washup.if22g.com/api'  // Tambahkan URL API di sini
+  apiUrl: 'http://127.0.0.1:8000/api'  // Tambahkan URL API di sini
 };

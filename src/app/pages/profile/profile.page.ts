@@ -174,7 +174,6 @@ export class ProfilePage implements OnInit, AfterViewInit {
         await this.presentLoading();
 
         const response = await this.http.put<any>(url, dataToSend, { headers }).toPromise();
-        console.log('Update Success:', response);
 
         await this.storage?.set('customerData', this.customerData);
 

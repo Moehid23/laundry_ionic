@@ -11,8 +11,11 @@
         <span class="name">{{ customerData.name }}</span>
         <span class="points">Poin: {{ customerData.points }}</span>
       </div>
+      <div class="voucher-details">
+        <img src="../../assets/icon/coupon1.png" alt="Voucher Icon" class="voucher-icon">
+        <span class="voucher">Voucher: {{ customerData.voucher_count }}</span>
+      </div>
     </div>
-
     <div class="icon-grid white-bg">
       <ion-grid>
         <ion-row>
@@ -250,6 +253,23 @@ ion-tab-button[selected] .tab-icon {
 .custom-loading {
   --background: rgba(0, 0, 0, 0.5); /* warna background semi-transparan */
   --spinner-color: #ffffff; /* warna spinner */
+}
+
+.voucher-details {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.voucher-details .voucher {
+  font-size: 14px;
+  color: #888;
+}
+
+.voucher-icon {
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
 }
 
 

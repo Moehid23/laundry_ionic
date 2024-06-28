@@ -35,7 +35,7 @@ export class HomePage implements OnInit {
   ngOnInit() {
     this.initStorage().then(() => {
       this.loadUserName();
-      this.loadCustomerData();
+      this.fetchCustomerData(); // Memanggil fungsi fetchCustomerData untuk memperbarui data pelanggan
     }).finally(() => {
       this.dismissLoading();
     });
