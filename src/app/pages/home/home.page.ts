@@ -17,7 +17,6 @@ export class HomePage implements OnInit {
   latestResiData: any = null;
   private storage: Storage | null = null;
   loading: any;
-
   images = [
     '../../assets/1.jpg',
     '../../assets/2.jpg',
@@ -29,20 +28,25 @@ export class HomePage implements OnInit {
     private http: HttpClient,
     private navCtrl: NavController,
     private toastCtrl: ToastController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private storageService: Storage
   ) { }
 
   ngOnInit() {
     this.initStorage().then(() => {
       this.loadUserName();
-      this.fetchCustomerData(); // Memanggil fungsi fetchCustomerData untuk memperbarui data pelanggan
+      this.loadCustomerData(); // Mengubah ke loadCustomerData untuk konsistensi
     }).finally(() => {
       this.dismissLoading();
     });
   }
 
   async initStorage() {
-    this.storage = await this.storage || await new Storage().create();
+    try {
+      this.storage = await this.storageService.create();
+    } catch (error) {
+      console.error('Error initializing storage:', error);
+    }
   }
 
   loadUserName() {
@@ -83,6 +87,7 @@ export class HomePage implements OnInit {
       }
     } catch (error) {
       console.error('Failed to fetch customer data', error);
+      this.presentToast('Failed to fetch customer data');
     }
   }
 
@@ -186,7 +191,7 @@ export class HomePage implements OnInit {
 
   async presentToast(message: string) {
     const toast = await this.toastCtrl.create({
-      message: message,
+      message,
       duration: 3000,
       position: 'bottom'
     });
