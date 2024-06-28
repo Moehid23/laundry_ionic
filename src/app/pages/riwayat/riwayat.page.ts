@@ -4,6 +4,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment';
 import { LoadingController } from '@ionic/angular';
+import * as CryptoJS from 'crypto-js';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-riwayat',
@@ -22,7 +25,8 @@ export class RiwayatPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private router: Router // Tambahkan ini
   ) { }
 
   async ngOnInit() {
@@ -52,24 +56,30 @@ export class RiwayatPage implements OnInit {
   }
 
   async fetchTransactions() {
-    const token = localStorage.getItem('access_token');
-    if (token && this.customerId) {
+    try {
+      const encryptedToken = localStorage.getItem('access_token');
+      if (!encryptedToken) {
+        console.error('Token not found in localStorage');
+        this.router.navigate(['/login']); // Gunakan Router untuk navigasi
+        return;
+      }
+
+      // Decrypt token before using it
+      const token = this.decryptToken(encryptedToken);
+
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
       const url = `${environment.apiUrl}/transaksi/${this.customerId}`;
 
-      try {
-        const response = await this.http.get<any>(url, { headers }).toPromise();
-        console.log('Transaction Data:', response);
-        this.transactions = response.data;
-        this.filteredTransactions = response.data;
-        await this.storage?.set(`transactions_${this.customerId}`, response.data);
-      } catch (error) {
-        console.error('Failed to fetch transaction data', error);
-      }
-    } else {
-      console.error('Token or Customer ID not found');
+      const response = await this.http.get<any>(url, { headers }).toPromise();
+      console.log('Transaction Data:', response);
+      this.transactions = response.data;
+      this.filteredTransactions = response.data;
+      await this.storage?.set(`transactions_${this.customerId}`, response.data);
+    } catch (error) {
+      console.error('Failed to fetch transaction data', error);
     }
   }
+
 
   async presentLoading() {
     this.loading = await this.loadingController.create({
@@ -119,5 +129,9 @@ export class RiwayatPage implements OnInit {
     } else {
       this.filteredTransactions = this.transactions;
     }
+  }
+
+  decryptToken(encryptedToken: string): string {
+    return CryptoJS.AES.decrypt(encryptedToken, 'secret_key').toString(CryptoJS.enc.Utf8);
   }
 }

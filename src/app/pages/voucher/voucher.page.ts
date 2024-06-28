@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { ToastController, LoadingController } from '@ionic/angular';
+import { NavController, ToastController, LoadingController } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
-import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
+import * as CryptoJS from 'crypto-js'; // Import CryptoJS
 
 @Component({
   selector: 'app-voucher',
@@ -12,124 +12,79 @@ import { Router } from '@angular/router';
 })
 export class VoucherPage implements OnInit {
   vouchers: any[] = [];
-  customer: any = null;
   private storage: Storage | null = null;
   loading: any;
 
   constructor(
     private http: HttpClient,
-    private toastController: ToastController,
-    private loadingController: LoadingController,
-    private ionicStorage: Storage,
-    private router: Router
-  ) {
-    this.initStorage();
-  }
+    private navCtrl: NavController,
+    private toastCtrl: ToastController,
+    private loadingController: LoadingController
+  ) { }
 
-  async ngOnInit() {
-    await this.presentLoading(); // Tampilkan loading spinner saat halaman dimuat
-    await this.loadCustomerData();
-    await this.loadVouchers();
-    await this.dismissLoading(); // Sembunyikan loading spinner setelah data dimuat
+  ngOnInit() {
+    this.initStorage().then(() => {
+      this.fetchVouchersData(); // Memanggil fungsi fetchVouchersData untuk memperbarui data voucher
+    }).finally(() => {
+      this.dismissLoading();
+    });
   }
 
   async initStorage() {
-    this.storage = await this.ionicStorage.create();
-  }
-
-  async loadCustomerData() {
-    try {
-      const data = await this.storage?.get('customerData');
-      if (data) {
-        this.customer = data;
-      } else {
-        await this.fetchCustomerData();
-      }
-    } catch (error) {
-      console.error('Error loading customer data:', error);
-    }
-  }
-
-  async fetchCustomerData() {
-    try {
-      const accessToken = localStorage.getItem('access_token');
-      if (accessToken) {
-        const headers = new HttpHeaders({ 'Authorization': `Bearer ${accessToken}` });
-        const url = `${environment.apiUrl}/customer`;
-
-        const response = await this.http.get<any>(url, { headers }).toPromise();
-        console.log('Customer Data:', response);
-        this.customer = response.data;
-        await this.storage?.set('customerData', response.data);
-      } else {
-        console.error('Access token not found');
-      }
-    } catch (error) {
-      console.error('Failed to fetch customer data', error);
-    }
-  }
-
-  async loadVouchers() {
-    try {
-      const data = await this.storage?.get('vouchersData');
-      if (data) {
-        this.vouchers = data;
-      } else {
-        await this.fetchVouchersData();
-      }
-    } catch (error) {
-      console.error('Error loading vouchers data:', error);
-    }
+    this.storage = await this.storage || await new Storage().create();
   }
 
   async fetchVouchersData() {
     try {
-      const accessToken = localStorage.getItem('access_token');
-      if (accessToken) {
-        const headers = new HttpHeaders({ 'Authorization': `Bearer ${accessToken}` });
-        const url = `${environment.apiUrl}/vouchers`;
-
-        const response = await this.http.get<any>(url, { headers }).toPromise();
-        console.log('Vouchers Data:', response);
-        this.vouchers = response.data;
-        await this.storage?.set('vouchersData', response.data);
-      } else {
-        console.error('Access token not found');
+      let encryptedToken = localStorage.getItem('access_token');
+      if (!encryptedToken) {
+        console.error('Token not found in localStorage');
+        this.navCtrl.navigateBack('/login');
+        return;
       }
+
+      // Decrypt token before using it
+      let token = this.decryptToken(encryptedToken);
+
+      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+      const url = `${environment.apiUrl}/vouchers`;
+
+      const response = await this.http.get<any>(url, { headers }).toPromise();
+      this.vouchers = response.data;
+      await this.storage?.set('vouchersData', response.data);
     } catch (error) {
       console.error('Failed to fetch vouchers data', error);
+      this.presentToast('Gagal memuat data voucher', 'danger');
     }
   }
 
   async claimVoucher(voucherId: number, pointsRequired: number) {
     try {
-      if (this.customer && this.customer.points >= pointsRequired) {
-        await this.presentLoading();
-
-        const accessToken = localStorage.getItem('access_token');
-        if (accessToken) {
-          const headers = new HttpHeaders({ 'Authorization': `Bearer ${accessToken}` });
-          const url = `${environment.apiUrl}/claim-voucher/${voucherId}`;
-
-          const response = await this.http.post<any>(url, {}, { headers }).toPromise();
-          console.log('Voucher claimed successfully', response);
-
-          this.customer.points -= pointsRequired;
-          await this.storage?.set('customerData', this.customer);
-
-          this.presentToast('Voucher berhasil diclaim', 'success');
-        } else {
-          console.error('Access token not found');
-        }
-
-        await this.dismissLoading();
-      } else {
-        console.error('Not enough points to claim this voucher');
-        this.presentToast('Point Anda tidak mencukupi untuk melakukan klaim voucher', 'danger');
+      let encryptedToken = localStorage.getItem('access_token');
+      if (!encryptedToken) {
+        console.error('Token not found in localStorage');
+        this.navCtrl.navigateBack('/login');
+        return;
       }
+
+      // Decrypt token before using it
+      let token = this.decryptToken(encryptedToken);
+
+      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+      const url = `${environment.apiUrl}/claim-voucher/${voucherId}`;
+
+      // Menampilkan loading sebelum request
+      await this.presentLoading();
+
+      const response = await this.http.post<any>(url, { points_required: pointsRequired }, { headers }).toPromise();
+      this.presentToast('Voucher berhasil di-claim', 'success');
+      // Lakukan pengolahan data setelah klaim voucher berhasil
+
     } catch (error) {
       console.error('Failed to claim voucher', error);
-      this.presentToast('Gagal melakukan klaim voucher', 'danger');
+      this.presentToast('Gagal meng-claim voucher', 'danger');
+    } finally {
+      // Tutup loading setelah request selesai
       await this.dismissLoading();
     }
   }
@@ -151,19 +106,23 @@ export class VoucherPage implements OnInit {
   }
 
   async presentToast(message: string, color: string) {
-    const toast = await this.toastController.create({
+    const toast = await this.toastCtrl.create({
       message: message,
-      duration: 2000,
+      duration: 3000,
       position: 'top',
       color: color
     });
     toast.present();
   }
 
+  decryptToken(encryptedToken: string): string {
+    return CryptoJS.AES.decrypt(encryptedToken, 'secret_key').toString(CryptoJS.enc.Utf8);
+  }
+
   navigateToRiwayat() {
     const customerId = localStorage.getItem('customer_id');
     if (customerId) {
-      this.router.navigate(['/riwayat', customerId]);
+      this.navCtrl.navigateForward(`/riwayat/${customerId}`);
     } else {
       console.error('Customer ID not found');
     }

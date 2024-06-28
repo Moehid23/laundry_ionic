@@ -5,6 +5,7 @@ import { Storage } from '@ionic/storage-angular';
 import { environment } from '../../../environments/environment';
 import { AnimationController, Animation } from '@ionic/angular';
 import { trigger, transition, style, animate } from '@angular/animations';
+import * as CryptoJS from 'crypto-js'; // Import CryptoJS
 
 @Component({
   selector: 'app-profile',
@@ -77,18 +78,23 @@ export class ProfilePage implements OnInit, AfterViewInit {
 
   async fetchCustomerData() {
     try {
-      const token = localStorage.getItem('access_token');
-      if (token) {
-        const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-        const url = `${environment.apiUrl}/customer`;
-
-        const response = await this.http.get<any>(url, { headers }).toPromise();
-        console.log('Customer Data:', response);
-        this.customerData = response.data;
-        await this.storage?.set('customerData', response.data);
-      } else {
-        console.error('Token not found');
+      const encryptedToken = localStorage.getItem('access_token');
+      if (!encryptedToken) {
+        console.error('Token not found in localStorage');
+        this.navCtrl.navigateBack('/login');
+        return;
       }
+
+      // Decrypt token before using it
+      const token = this.decryptToken(encryptedToken);
+
+      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+      const url = `${environment.apiUrl}/customer`;
+
+      const response = await this.http.get<any>(url, { headers }).toPromise();
+      console.log('Customer Data:', response);
+      this.customerData = response.data;
+      await this.storage?.set('customerData', response.data);
     } catch (error) {
       console.error('Failed to fetch customer data', error);
       this.presentToast('Gagal memuat data pelanggan', 'danger');
@@ -155,34 +161,39 @@ export class ProfilePage implements OnInit, AfterViewInit {
 
   async saveChanges() {
     try {
-      const token = localStorage.getItem('access_token');
-      if (token) {
-        const headers = new HttpHeaders({
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        });
-
-        const url = `${environment.apiUrl}/customer`;
-
-        // Prepare data to send including password fields
-        const dataToSend = {
-          ...this.customerData,
-          password: this.password,
-          password_confirmation: this.password_confirmation
-        };
-
-        await this.presentLoading();
-
-        const response = await this.http.put<any>(url, dataToSend, { headers }).toPromise();
-
-        await this.storage?.set('customerData', this.customerData);
-
-        await this.dismissLoading();
-
-        this.presentToast('Profil berhasil diperbarui', 'success');
-      } else {
-        console.error('Token not found');
+      const encryptedToken = localStorage.getItem('access_token');
+      if (!encryptedToken) {
+        console.error('Token not found in localStorage');
+        this.navCtrl.navigateBack('/login');
+        return;
       }
+
+      // Decrypt token before using it
+      const token = this.decryptToken(encryptedToken);
+
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      });
+
+      const url = `${environment.apiUrl}/customer`;
+
+      // Prepare data to send including password fields
+      const dataToSend = {
+        ...this.customerData,
+        password: this.password,
+        password_confirmation: this.password_confirmation
+      };
+
+      await this.presentLoading();
+
+      const response = await this.http.put<any>(url, dataToSend, { headers }).toPromise();
+
+      await this.storage?.set('customerData', this.customerData);
+
+      await this.dismissLoading();
+
+      this.presentToast('Profil berhasil diperbarui', 'success');
     } catch (error) {
       console.error('Failed to update profile:', error);
 
@@ -259,5 +270,9 @@ export class ProfilePage implements OnInit, AfterViewInit {
     } else {
       inputField.type = 'password';
     }
+  }
+
+  decryptToken(encryptedToken: string): string {
+    return CryptoJS.AES.decrypt(encryptedToken, 'secret_key').toString(CryptoJS.enc.Utf8);
   }
 }
